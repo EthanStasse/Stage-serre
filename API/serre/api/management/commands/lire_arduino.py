@@ -26,5 +26,14 @@ class Command(BaseCommand):
                         pompe=data['pompe']
                     )
                     self.stdout.write(f"Sauvegardé : {data}")
+                    
+                    # Vérifier si on dépasse 1000 enregistrements
+                    total_count = Serre.objects.count()
+                    if total_count > 1000:
+                        # Supprimer les plus anciens enregistrements
+                        to_delete = total_count - 1000
+                        oldest_records = Serre.objects.order_by('created_at')[:to_delete]
+                        oldest_records.delete()
+                        self.stdout.write(self.style.WARNING(f"Nettoyage : {to_delete} anciens enregistrements supprimés. Total : 1000"))
             except Exception as e:
                 self.stdout.write(f"Erreur : {e}")
