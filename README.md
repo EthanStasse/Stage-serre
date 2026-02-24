@@ -16,4 +16,5 @@ ip Raspberry :
 http://192.168.0.10:8000/polls/
 source venv/bin/activate
 python -m pip install --upgrade pip
+pip install pyserial
 python -m pip install Django==6.0.2
