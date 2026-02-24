@@ -18,3 +18,4 @@ source venv/bin/activate
 python -m pip install --upgrade pip
 pip install pyserial
 python -m pip install Django==6.0.2
+pip3 install django djangorestframework pyserial
