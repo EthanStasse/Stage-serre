@@ -6,7 +6,7 @@ from .serializers import SerreSerializer
 
 @api_view(['GET'])
 def get_serre(request):
-    serre = Serre.objects.all().order_by('-created_at')[:50]
+    serre = Serre.objects.all().order_by('-created_at')[:10]
     serializer = SerreSerializer(serre, many=True)
     return Response(serializer.data)   
 
