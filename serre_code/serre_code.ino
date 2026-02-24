@@ -18,13 +18,13 @@
 /* ====== SEUILS ====== */
 #define SOIL_DRY_THRESHOLD 100
 
-#define TEMP_MAX 30.0          // ouverture servo
-#define TEMP_DAY_ON 22.0       // NUIT → JOUR
-#define TEMP_NIGHT_ON 18.0     // JOUR → NUIT
+#define TEMP_MAX 30.0
+#define TEMP_DAY_ON 22.0
+#define TEMP_NIGHT_ON 18.0
 
 #define PUMP_ON_TIME 1000UL
-#define PUMP_LOCK_TIME 3600000UL
-#define SERIAL_INTERVAL 1000UL
+#define PUMP_LOCK_TIME 600000UL
+#define SERIAL_INTERVAL 10000UL
 
 /* ====== SERVO LENT ====== */
 #define SERVO_MIN_ANGLE 0
@@ -72,7 +72,6 @@ bool buttonLastState = HIGH;
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("=== SERRE AUTONOME STABLE ===");
 
   pinMode(PUMP_RELAY_PIN, OUTPUT);
   pinMode(LIGHT_RELAY_PIN, OUTPUT);
@@ -103,7 +102,7 @@ void loop() {
   /* ====== LUMIERE ====== */
   int lightValue = digitalRead(LIGHT_SENSOR_PIN);
 
-  /* ====== DHT (lecture max toutes les 2s) ====== */
+  /* ====== DHT ====== */
   if (now - lastDHTRead >= 2000) {
     lastDHTRead = now;
     lastTemp = dht.readTemperature();
@@ -113,21 +112,18 @@ void loop() {
   float temp = lastTemp;
   float humAir = lastHum;
 
-  /* ====== JOUR / NUIT AVEC HYSTERESIS ====== */
+  /* ====== JOUR / NUIT ====== */
   if (isDay) {
     if (!isnan(temp) && temp < TEMP_NIGHT_ON && lightValue == LOW) {
       isDay = false;
-      Serial.println("[LUMIERE] Passage NUIT");
     }
   } else {
     if (!isnan(temp) && (temp > TEMP_DAY_ON || lightValue == HIGH)) {
       isDay = true;
-      Serial.println("[LUMIERE] Passage JOUR");
     }
   }
 
   /* ====== RELAIS LUMIERE ====== */
-  // ⚠️ Si ton relais est ACTIF LOW, inverse HIGH / LOW ici
   digitalWrite(LIGHT_RELAY_PIN, (!isDay && lightValue == LOW) ? HIGH : LOW);
 
   /* ====== LCD ====== */
@@ -143,17 +139,13 @@ void loop() {
 
   if (buttonLastState == HIGH && buttonState == LOW &&
       now - lastButtonTime > BUTTON_DEBOUNCE) {
-
     lastButtonTime = now;
     servoTestActive = true;
     servoReturning = false;
-
     servoSavedPosition = servoPosition;
     servoTarget = (servoPosition <= SERVO_MIN_ANGLE + 5)
                     ? SERVO_MAX_ANGLE
                     : SERVO_MIN_ANGLE;
-
-    Serial.println("[BOUTON] Test servo");
   }
 
   buttonLastState = buttonState;
@@ -166,24 +158,34 @@ void loop() {
   }
 
   /* ====== SERVO LENT ====== */
-  if (now - lastServoUpdate >= SERVO_UPDATE_INTERVAL) {
+if (now - lastServoUpdate >= SERVO_UPDATE_INTERVAL) {
     lastServoUpdate = now;
 
-    if (servoPosition < servoTarget) servoPosition++;
-    else if (servoPosition > servoTarget) servoPosition--;
+    if (servoPosition != servoTarget) {
+        // Rattacher si nécessaire avant de bouger
+        if (!servo.attached()) servo.attach(SERVO_PIN);
 
-    servo.write(servoPosition);
+        if (servoPosition < servoTarget) servoPosition++;
+        else if (servoPosition > servoTarget) servoPosition--;
 
-    if (servoTestActive && servoPosition == servoTarget) {
-      if (!servoReturning) {
-        servoReturning = true;
-        servoTarget = servoSavedPosition;
-      } else {
-        servoTestActive = false;
-        servoReturning = false;
-      }
+        servo.write(servoPosition);
+
+        // Gestion fin de test bouton
+        if (servoTestActive && servoPosition == servoTarget) {
+            if (!servoReturning) {
+                servoReturning = true;
+                servoTarget = servoSavedPosition;
+            } else {
+                servoTestActive = false;
+                servoReturning = false;
+            }
+        }
+
+    } else {
+        // Position atteinte → on coupe le signal pour arrêter les vibrations
+        if (servo.attached()) servo.detach();
     }
-  }
+}
 
   /* ====== POMPE ====== */
   if (pumpLocked && now - pumpLockStartTime >= PUMP_LOCK_TIME) {
@@ -203,20 +205,18 @@ void loop() {
     digitalWrite(PUMP_RELAY_PIN, LOW);
   }
 
-  /* ====== SERIAL ====== */
+  /* ====== SERIAL JSON → Raspberry Pi ====== */
   if (now - lastSerialTime >= SERIAL_INTERVAL) {
     lastSerialTime = now;
 
-    Serial.println("----- ETAT -----");
-    Serial.print("Sol: "); Serial.println(soilValue);
-    Serial.print("Temp: "); Serial.print(temp);
-    Serial.print(" C  Air: "); Serial.print(humAir); Serial.println(" %");
-    Serial.print("Lumiere: "); Serial.println(lightValue ? "FORTE" : "FAIBLE");
-    Serial.print("Periode: "); Serial.println(isDay ? "JOUR" : "NUIT");
-    Serial.print("Servo: "); Serial.println(servoPosition);
-    Serial.print("Pompe: ");
-    Serial.println(pumpRunning ? "ON" : pumpLocked ? "LOCK" : "OFF");
-    Serial.println("----------------");
+    Serial.print("{");
+    Serial.print("\"sol\":");       Serial.print(soilValue);    Serial.print(",");
+    Serial.print("\"temp\":");      Serial.print(temp);          Serial.print(",");
+    Serial.print("\"hum\":");       Serial.print(humAir);        Serial.print(",");
+    Serial.print("\"lumiere\":");   Serial.print(lightValue);    Serial.print(",");
+    Serial.print("\"periode\":\""); Serial.print(isDay ? "JOUR" : "NUIT"); Serial.print("\",");
+    Serial.print("\"servo\":");     Serial.print(servoPosition); Serial.print(",");
+    Serial.print("\"pompe\":\"");   Serial.print(pumpRunning ? "ON" : pumpLocked ? "LOCK" : "OFF"); Serial.print("\"");
+    Serial.println("}");
   }
 }
-
