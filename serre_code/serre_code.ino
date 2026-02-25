@@ -17,7 +17,6 @@
 
 /* ====== SEUILS ====== */
 #define SOIL_DRY_THRESHOLD 100
-#define TEMP_MAX 30.0
 #define TEMP_DAY_ON 22.0
 #define TEMP_NIGHT_ON 18.0
 
@@ -25,31 +24,23 @@
 #define PUMP_LOCK_TIME 600000UL
 #define SERIAL_INTERVAL 1000UL
 
-/* ====== SERVO LENT ====== */
-#define SERVO_MIN_ANGLE 0
-#define SERVO_MAX_ANGLE 180
+/* ====== SERVO ====== */
 #define SERVO_STEP 1
-#define SERVO_UPDATE_INTERVAL 40UL
+#define SERVO_INTERVAL 20   // vitesse (plus petit = plus rapide)
 
-#define BUTTON_DEBOUNCE 200UL
-
-/* ====== OBJETS ====== */
 rgb_lcd lcd;
 DHT dht(DHT_PIN, DHT_TYPE);
 Servo servo;
 
-/* ====== VARIABLES TEMPS ====== */
+/* ====== VARIABLES ====== */
 unsigned long now;
 unsigned long lastSerialTime = 0;
-unsigned long lastServoUpdate = 0;
-unsigned long lastButtonTime = 0;
-
-/* ====== DHT ====== */
 unsigned long lastDHTRead = 0;
+unsigned long lastServoMove = 0;
+
 float lastTemp = NAN;
 float lastHum = NAN;
 
-/* ====== ETATS ====== */
 bool isDay = true;
 
 /* ====== POMPE ====== */
@@ -58,14 +49,12 @@ bool pumpLocked = false;
 unsigned long pumpStartTime = 0;
 unsigned long pumpLockStartTime = 0;
 
-/* ====== SERVO ====== */
-int servoPosition = SERVO_MIN_ANGLE;
-int servoTarget = SERVO_MIN_ANGLE;
+/* ====== SERVO ETAT ====== */
+bool servoAttached = false;
+int servoPosition;   // position actuelle (ne pas initialiser pour garder la position physique)
+int servoTarget;     // position cible
 
-/* ====== BOUTON ====== */
-bool buttonLastState = HIGH;
-
-/* ====== SERIAL BUFFER ====== */
+/* ====== SERIAL ====== */
 String cmd = "";
 
 void setup() {
@@ -79,8 +68,8 @@ void setup() {
   digitalWrite(PUMP_RELAY_PIN, LOW);
   digitalWrite(LIGHT_RELAY_PIN, LOW);
 
-  servo.attach(SERVO_PIN);
-  servo.write(servoPosition);
+  // Ne pas attacher le servo ici
+  // servo.attach(SERVO_PIN); // ✖
 
   dht.begin();
 
@@ -91,7 +80,6 @@ void setup() {
 }
 
 void loop() {
-
   now = millis();
 
   /* ====== SOL ====== */
@@ -113,48 +101,19 @@ void loop() {
 
   /* ====== JOUR / NUIT ====== */
   if (isDay) {
-    if (!isnan(temp) && temp < TEMP_NIGHT_ON && lightValue == LOW) {
+    if (!isnan(temp) && temp < TEMP_NIGHT_ON && lightValue == LOW)
       isDay = false;
-    }
   } else {
-    if (!isnan(temp) && (temp > TEMP_DAY_ON || lightValue == HIGH)) {
+    if (!isnan(temp) && (temp > TEMP_DAY_ON || lightValue == HIGH))
       isDay = true;
-    }
   }
 
-  /* ====== RELAIS LUMIERE ====== */
-  bool lightRelayOn = (!isDay && lightValue == LOW);
-  digitalWrite(LIGHT_RELAY_PIN, lightRelayOn ? HIGH : LOW);
-
-  /* ====== LCD ====== */
-  lcd.setCursor(0, 1);
-  lcd.print("Valeur: ");
-  lcd.print(soilValue);
-  lcd.print("    ");
-
+  digitalWrite(LIGHT_RELAY_PIN, (!isDay && lightValue == LOW));
   lcd.setRGB(soilDry ? 255 : 0, soilDry ? 165 : 255, 0);
 
-  /* ====== SERVO AUTO (temperature) ====== */
-  servoTarget = (!isnan(temp) && temp > TEMP_MAX)
-                  ? SERVO_MAX_ANGLE
-                  : SERVO_MIN_ANGLE;
-
-  /* ====== SERVO LENT ====== */
-  if (now - lastServoUpdate >= SERVO_UPDATE_INTERVAL) {
-    lastServoUpdate = now;
-
-    if (servoPosition != servoTarget) {
-      if (servoPosition < servoTarget) servoPosition++;
-      else if (servoPosition > servoTarget) servoPosition--;
-
-      servo.write(servoPosition);
-    }
-  }
-
   /* ====== POMPE ====== */
-  if (pumpLocked && now - pumpLockStartTime >= PUMP_LOCK_TIME) {
+  if (pumpLocked && now - pumpLockStartTime >= PUMP_LOCK_TIME)
     pumpLocked = false;
-  }
 
   if (!pumpLocked && !pumpRunning && soilDry) {
     pumpRunning = true;
@@ -169,7 +128,26 @@ void loop() {
     digitalWrite(PUMP_RELAY_PIN, LOW);
   }
 
-  /* ====== ENVOI JSON VERS RASPBERRY ====== */
+  /* ====== MOUVEMENT SERVO PROGRESSIF ====== */
+  if (servoAttached && now - lastServoMove >= SERVO_INTERVAL) {
+    lastServoMove = now;
+
+    if (servoPosition < servoTarget) {
+      servoPosition += SERVO_STEP;
+      servo.write(servoPosition);
+    }
+    else if (servoPosition > servoTarget) {
+      servoPosition -= SERVO_STEP;
+      servo.write(servoPosition);
+    }
+    else {
+      // Position atteinte → on détache pour économiser la batterie
+      servo.detach();
+      servoAttached = false;
+    }
+  }
+
+  /* ====== ENVOI JSON ====== */
   if (now - lastSerialTime >= SERIAL_INTERVAL) {
     lastSerialTime = now;
 
@@ -177,7 +155,6 @@ void loop() {
     Serial.print("\"sol\":"); Serial.print(soilValue); Serial.print(",");
     Serial.print("\"temp\":"); Serial.print(temp); Serial.print(",");
     Serial.print("\"hum\":"); Serial.print(humAir); Serial.print(",");
-    Serial.print("\"lumiere\":"); Serial.print(lightValue); Serial.print(",");
     Serial.print("\"servo\":"); Serial.print(servoPosition);
     Serial.println("}");
   }
@@ -191,17 +168,39 @@ void loop() {
 
       if (cmd == "toit_1") {
         servoTarget = 180;
-        Serial.println("ACK:toit_1");
+
+        if (!servoAttached) {
+          servo.attach(SERVO_PIN);   // attache le servo sans changer la position actuelle
+          servoAttached = true;
+        }
+
+        lcd.setCursor(0,1);
+        lcd.print("ACK:toit_1");
       }
       else if (cmd == "toit_0") {
         servoTarget = 0;
-        Serial.println("ACK:toit_0");
+
+        if (!servoAttached) {
+          servo.attach(SERVO_PIN);   // attache le servo sans changer la position actuelle
+          servoAttached = true;
+        }
+            lcd.setCursor(0,1);
+        lcd.print("ACK:toit_0");
+
       }
 
       cmd = "";
-    }
-    else {
+    } else {
       cmd += c;
     }
+  }
+
+  if(digitalRead(BUTTON_PIN) == HIGH){
+    servo.attach(SERVO_PIN);
+    servo.write(0);
+    delay(1000);
+    servo.detach();
+
+
   }
 }
