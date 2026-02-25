@@ -99,6 +99,14 @@ h1 {
     color: #f44336;
 }
 
+/* LED card states */
+.card.active .card-value {
+    color: #4CAF50;
+}
+.card.inactive .card-value {
+    color: #999;
+}
+
 .history-section {
     background: white;
     padding: 20px;

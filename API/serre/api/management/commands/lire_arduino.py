@@ -23,7 +23,8 @@ class Command(BaseCommand):
                         lumière=data['lumiere'],
                         periode=data['periode'],
                         servo=data['servo'],
-                        pompe=data['pompe']
+                        pompe=data['pompe'],
+                        led=data.get('led', 'OFF')
                     )
                     self.stdout.write(f"Sauvegardé : {data}")
                     

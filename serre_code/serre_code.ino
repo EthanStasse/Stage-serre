@@ -124,7 +124,8 @@ void loop() {
   }
 
   /* ====== RELAIS LUMIERE ====== */
-  digitalWrite(LIGHT_RELAY_PIN, (!isDay && lightValue == LOW) ? HIGH : LOW);
+  bool lightRelayOn = (!isDay && lightValue == LOW);
+  digitalWrite(LIGHT_RELAY_PIN, lightRelayOn ? HIGH : LOW);
 
   /* ====== LCD ====== */
   lcd.setCursor(0, 1);
@@ -214,6 +215,7 @@ if (now - lastServoUpdate >= SERVO_UPDATE_INTERVAL) {
     Serial.print("\"temp\":");      Serial.print(temp);          Serial.print(",");
     Serial.print("\"hum\":");       Serial.print(humAir);        Serial.print(",");
     Serial.print("\"lumiere\":");   Serial.print(lightValue);    Serial.print(",");
+    Serial.print("\"led\":\""); Serial.print(lightRelayOn ? "ON" : "OFF"); Serial.print("\",");
     Serial.print("\"periode\":\""); Serial.print(isDay ? "JOUR" : "NUIT"); Serial.print("\",");
     Serial.print("\"servo\":");     Serial.print(servoPosition); Serial.print(",");
     Serial.print("\"pompe\":\"");   Serial.print(pumpRunning ? "ON" : pumpLocked ? "LOCK" : "OFF"); Serial.print("\"");

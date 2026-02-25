@@ -43,6 +43,10 @@
                 <div class="card-title">Luminosité</div>
                 <div class="card-value">-- Lux</div>
             </div>
+            <div class="card" id="ledCard">
+                <div class="card-title">LED</div>
+                <div class="card-value">--</div>
+            </div>
             <div class="card" id="servoCard">
                 <div class="card-title">Servo</div>
                 <div class="card-value">-- °</div>
@@ -95,6 +99,20 @@
                 updateCard('servoCard', lastData.servo, '°');
                 updateCard('periodeCard', lastData.periode, '');
                 updateCard('pompeCard', lastData.pompe, '');
+                updateCard('ledCard', lastData.led, '');
+
+                // Mettre à jour l'indicateur led (petit cercle) et la carte
+                const ledIndicator = document.querySelector('.status-indicator');
+                const ledCard = document.getElementById('ledCard');
+                if (lastData.led && lastData.led === 'ON') {
+                    ledIndicator.style.backgroundColor = '#4CAF50';
+                    ledCard.classList.add('active');
+                    ledCard.classList.remove('inactive');
+                } else {
+                    ledIndicator.style.backgroundColor = '#999';
+                    ledCard.classList.remove('active');
+                    ledCard.classList.add('inactive');
+                }
 
                 // Ajouter une classe de mise à jour
                 document.querySelectorAll('.card').forEach(card => {
