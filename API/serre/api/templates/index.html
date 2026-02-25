@@ -128,9 +128,39 @@
         }
 
 
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            const btn = document.getElementById('toggleAutoBtn');
+            if (autoRefreshEnabled) {
+                btn.textContent = '⏸️ Arrêter le rafraîchissement';
+                startAutoRefresh();
+            } else {
+                btn.textContent = '▶️ Reprendre le rafraîchissement';
+                clearInterval(refreshTimer);
+            }
+        }
+
+        function startAutoRefresh() {
+            clearInterval(refreshTimer);
+            refreshTimer = setInterval(() => {
+                if (autoRefreshEnabled) {
+                    refreshData();
+                }
+            }, refreshInterval);
+        }
+
+        function changeRefreshRate(value) {
+            refreshInterval = parseInt(value) * 1000;
+            document.getElementById('refreshRate').textContent = value;
+            if (autoRefreshEnabled) {
+                startAutoRefresh();
+            }
+        }
+
         // Initialiser
         document.addEventListener('DOMContentLoaded', () => {
             refreshData();
+            startAutoRefresh();
         });
 
         // Rafraîchir quand on revient sur la page
