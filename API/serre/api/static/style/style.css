@@ -100,11 +100,9 @@ h1 {
 }
 
 /* LED card states */
-.card.active .card-value {
-    color: #4CAF50;
-}
+.card.active .card-value,
 .card.inactive .card-value {
-    color: #999;
+    color: #667eea;
 }
 
 .history-section {
