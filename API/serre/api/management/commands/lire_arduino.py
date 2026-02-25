@@ -35,7 +35,7 @@ class Command(BaseCommand):
                                 sol=data['sol'],
                                 temp=data['temp'],
                                 hum=data['hum'],
-                                lumière=data['lumiere'],
+                                lumiere=data['lumiere'],
                                 periode=data['periode'],
                                 servo=data['servo'],
                                 pompe=data['pompe'],
