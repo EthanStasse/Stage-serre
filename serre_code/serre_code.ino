@@ -17,7 +17,6 @@
 
 /* ====== SEUILS ====== */
 #define SOIL_DRY_THRESHOLD 100
-
 #define TEMP_MAX 30.0
 #define TEMP_DAY_ON 22.0
 #define TEMP_NIGHT_ON 18.0
@@ -45,12 +44,12 @@ unsigned long lastSerialTime = 0;
 unsigned long lastServoUpdate = 0;
 unsigned long lastButtonTime = 0;
 
-/* ====== DHT SECURISE ====== */
+/* ====== DHT ====== */
 unsigned long lastDHTRead = 0;
 float lastTemp = NAN;
 float lastHum = NAN;
 
-/* ====== ETAT JOUR / NUIT ====== */
+/* ====== ETATS ====== */
 bool isDay = true;
 
 /* ====== POMPE ====== */
@@ -63,12 +62,11 @@ unsigned long pumpLockStartTime = 0;
 int servoPosition = SERVO_MIN_ANGLE;
 int servoTarget = SERVO_MIN_ANGLE;
 
-bool servoTestActive = false;
-bool servoReturning = false;
-int servoSavedPosition = SERVO_MIN_ANGLE;
-
 /* ====== BOUTON ====== */
 bool buttonLastState = HIGH;
+
+/* ====== SERIAL BUFFER ====== */
+String cmd = "";
 
 void setup() {
   Serial.begin(9600);
@@ -93,6 +91,7 @@ void setup() {
 }
 
 void loop() {
+
   now = millis();
 
   /* ====== SOL ====== */
@@ -135,58 +134,22 @@ void loop() {
 
   lcd.setRGB(soilDry ? 255 : 0, soilDry ? 165 : 255, 0);
 
-  /* ====== BOUTON ====== */
-  bool buttonState = digitalRead(BUTTON_PIN);
-
-  if (buttonLastState == HIGH && buttonState == LOW &&
-      now - lastButtonTime > BUTTON_DEBOUNCE) {
-    lastButtonTime = now;
-    servoTestActive = true;
-    servoReturning = false;
-    servoSavedPosition = servoPosition;
-    servoTarget = (servoPosition <= SERVO_MIN_ANGLE + 5)
-                    ? SERVO_MAX_ANGLE
-                    : SERVO_MIN_ANGLE;
-  }
-
-  buttonLastState = buttonState;
-
-  /* ====== SERVO AUTO ====== */
-  if (!servoTestActive) {
-    servoTarget = (!isnan(temp) && temp > TEMP_MAX)
-                    ? SERVO_MAX_ANGLE
-                    : SERVO_MIN_ANGLE;
-  }
+  /* ====== SERVO AUTO (temperature) ====== */
+  servoTarget = (!isnan(temp) && temp > TEMP_MAX)
+                  ? SERVO_MAX_ANGLE
+                  : SERVO_MIN_ANGLE;
 
   /* ====== SERVO LENT ====== */
-if (now - lastServoUpdate >= SERVO_UPDATE_INTERVAL) {
+  if (now - lastServoUpdate >= SERVO_UPDATE_INTERVAL) {
     lastServoUpdate = now;
 
     if (servoPosition != servoTarget) {
-        // Rattacher si nécessaire avant de bouger
-        if (!servo.attached()) servo.attach(SERVO_PIN);
+      if (servoPosition < servoTarget) servoPosition++;
+      else if (servoPosition > servoTarget) servoPosition--;
 
-        if (servoPosition < servoTarget) servoPosition++;
-        else if (servoPosition > servoTarget) servoPosition--;
-
-        servo.write(servoPosition);
-
-        // Gestion fin de test bouton
-        if (servoTestActive && servoPosition == servoTarget) {
-            if (!servoReturning) {
-                servoReturning = true;
-                servoTarget = servoSavedPosition;
-            } else {
-                servoTestActive = false;
-                servoReturning = false;
-            }
-        }
-
-    } else {
-        // Position atteinte → on coupe le signal pour arrêter les vibrations
-        if (servo.attached()) servo.detach();
+      servo.write(servoPosition);
     }
-}
+  }
 
   /* ====== POMPE ====== */
   if (pumpLocked && now - pumpLockStartTime >= PUMP_LOCK_TIME) {
@@ -206,61 +169,39 @@ if (now - lastServoUpdate >= SERVO_UPDATE_INTERVAL) {
     digitalWrite(PUMP_RELAY_PIN, LOW);
   }
 
-  /* ====== SERIAL JSON → Raspberry Pi ====== */
+  /* ====== ENVOI JSON VERS RASPBERRY ====== */
   if (now - lastSerialTime >= SERIAL_INTERVAL) {
     lastSerialTime = now;
 
     Serial.print("{");
-    Serial.print("\"sol\":");       Serial.print(soilValue);    Serial.print(",");
-    Serial.print("\"temp\":");      Serial.print(temp);          Serial.print(",");
-    Serial.print("\"hum\":");       Serial.print(humAir);        Serial.print(",");
-    Serial.print("\"lumiere\":");   Serial.print(lightValue);    Serial.print(",");
-    Serial.print("\"led\":\""); Serial.print(lightRelayOn ? "ON" : "OFF"); Serial.print("\",");
-    Serial.print("\"periode\":\""); Serial.print(isDay ? "JOUR" : "NUIT"); Serial.print("\",");
-    Serial.print("\"servo\":");     Serial.print(servoPosition); Serial.print(",");
-    Serial.print("\"pompe\":\"");   Serial.print(pumpRunning ? "ON" : pumpLocked ? "LOCK" : "OFF"); Serial.print("\"");
+    Serial.print("\"sol\":"); Serial.print(soilValue); Serial.print(",");
+    Serial.print("\"temp\":"); Serial.print(temp); Serial.print(",");
+    Serial.print("\"hum\":"); Serial.print(humAir); Serial.print(",");
+    Serial.print("\"lumiere\":"); Serial.print(lightValue); Serial.print(",");
+    Serial.print("\"servo\":"); Serial.print(servoPosition);
     Serial.println("}");
   }
 
-  /* ====== READ COMMANDS FROM SERIAL (non-blocking) ====== */
-  if (Serial.available()) {
-    String cmdLine = Serial.readStringUntil('\n');
-    cmdLine.trim();
-    Serial.print("[DEBUG] Reçu: '");
-    Serial.print(cmdLine);
-    Serial.println("'");
-    
-    if (cmdLine.length() > 0) {
-      // Expected commands: TOIT:OPEN, TOIT:CLOSE, TOIT:STOP
-      if (cmdLine.startsWith("TOIT:")) {
-        String arg = cmdLine.substring(5);
-        arg.trim();
-        Serial.print("[DEBUG] Commande TOIT détectée, arg: '");
-        Serial.print(arg);
-        Serial.println("'");
-        
-        if (arg == "OPEN") {
-          Serial.println("[DEBUG] -> OPEN: servoTarget = MAX");
-          servoTarget = SERVO_MAX_ANGLE;
-          servoTestActive = false;
-        } else if (arg == "CLOSE") {
-          Serial.println("[DEBUG] -> CLOSE: servoTarget = MIN");
-          servoTarget = SERVO_MIN_ANGLE;
-          servoTestActive = false;
-        } else if (arg == "STOP") {
-          Serial.println("[DEBUG] -> STOP: servoTarget = current");
-          servoTarget = servoPosition;
-          servoTestActive = false;
-        } else {
-          Serial.print("[DEBUG] Arg non reconnu: ");
-          Serial.println(arg);
-        }
-        Serial.print("[DEBUG] Nouveau servoTarget: ");
-        Serial.println(servoTarget);
-        Serial.println("TOIT:ACK");
-      } else {
-        Serial.println("[DEBUG] Pas une commande TOIT");
+  /* ====== RECEPTION COMMANDE ====== */
+  while (Serial.available()) {
+    char c = Serial.read();
+
+    if (c == '\n') {
+      cmd.trim();
+
+      if (cmd == "toit_1") {
+        servoTarget = 180;
+        Serial.println("ACK:toit_1");
       }
+      else if (cmd == "toit_0") {
+        servoTarget = 0;
+        Serial.println("ACK:toit_0");
+      }
+
+      cmd = "";
+    }
+    else {
+      cmd += c;
     }
   }
 }
