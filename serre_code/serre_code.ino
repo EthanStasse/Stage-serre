@@ -26,7 +26,7 @@
 
 /* ====== SERVO ====== */
 #define SERVO_STEP 1
-#define SERVO_INTERVAL 20   // vitesse (plus petit = plus rapide)
+#define SERVO_INTERVAL 20  
 
 rgb_lcd lcd;
 DHT dht(DHT_PIN, DHT_TYPE);
@@ -36,7 +36,7 @@ Servo servo;
 unsigned long now;
 unsigned long lastSerialTime = 0;
 unsigned long lastDHTRead = 0;
-unsigned long lastServoMove = 0;
+unsigned long lastServoMove = 110;
 
 float lastTemp = NAN;
 float lastHum = NAN;
@@ -68,8 +68,6 @@ void setup() {
   digitalWrite(PUMP_RELAY_PIN, LOW);
   digitalWrite(LIGHT_RELAY_PIN, LOW);
 
-  // Ne pas attacher le servo ici
-  // servo.attach(SERVO_PIN); // ✖
 
   dht.begin();
 
@@ -168,6 +166,7 @@ void loop() {
 
       if (cmd == "toit_1") {
         servoTarget = 180;
+        servoPosition = 110;
 
         if (!servoAttached) {
           servo.attach(SERVO_PIN);   // attache le servo sans changer la position actuelle
@@ -178,7 +177,8 @@ void loop() {
         lcd.print("ACK:toit_1");
       }
       else if (cmd == "toit_0") {
-        servoTarget = 0;
+        servoTarget = 110;
+        servoPosition = 180;
 
         if (!servoAttached) {
           servo.attach(SERVO_PIN);   // attache le servo sans changer la position actuelle
@@ -197,7 +197,7 @@ void loop() {
 
   if(digitalRead(BUTTON_PIN) == HIGH){
     servo.attach(SERVO_PIN);
-    servo.write(0);
+    servo.write(110);
     delay(1000);
     servo.detach();
 

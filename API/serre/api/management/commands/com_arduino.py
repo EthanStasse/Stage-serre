@@ -36,7 +36,7 @@ class Command(BaseCommand):
                 # ---------------- TOGGLE SERVO ----------------
                 ser.write(("toit_1\n").encode('utf-8'))
                 ser.flush()
-                print("[SERIAL] Command sent: toit_0")
+                print("[SERIAL] Command sent: toit_1")
                 time.sleep(4)
                 ser.write(("toit_0\n").encode('utf-8'))
                 ser.flush()
