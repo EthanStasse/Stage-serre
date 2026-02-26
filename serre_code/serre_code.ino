@@ -139,6 +139,16 @@ void loop() {
 
   }
 
+  if (temp<20){
+
+    servoTarget = 110;
+    if (!servoAttached) {
+      servo.attach(SERVO_PIN);   // attache le servo
+      servoAttached = true;
+    }
+    
+    }
+
   /* ====== MOUVEMENT SERVO PROGRESSIF ====== */
   if (servoAttached && now - lastServoMove >= SERVO_INTERVAL) {
     lastServoMove = now;
