@@ -17,11 +17,11 @@
             <div class="status">
                 <form method="POST">
                     {% csrf_token %}
-                    {% if servo < 90 %}
+                    {% if toit==0 %}
                         <button name="commande" value="toit_1">Ouvrir</button>
-                    {% else %}
+                    {% toit=1 elif toit==1 %}
                         <button name="commande" value="toit_0">Fermer</button>
-                    {% endif %}
+                    {% toit=0 endif %}
 </form>
                 <div class="status-indicator"></div>
                 <div>
