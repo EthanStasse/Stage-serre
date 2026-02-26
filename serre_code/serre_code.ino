@@ -125,11 +125,12 @@ void loop() {
     pumpLockStartTime = now;
     digitalWrite(PUMP_RELAY_PIN, LOW);
   }
-
-  if(temp>20){
+  
+  /* ===== SERVO AUTO ===== */
+  if(temp>40){
 
     servoTarget = 180;
-    servoPosition = 110;
+
 
     if (!servoAttached) {
       servo.attach(SERVO_PIN);   // attache le servo
@@ -157,6 +158,9 @@ void loop() {
     }
   }
 
+  lcd.setCursor(0,1);
+  lcd.print(soilValue);
+
   /* ====== ENVOI JSON ====== */
   if (now - lastSerialTime >= SERIAL_INTERVAL) {
     lastSerialTime = now;
@@ -182,7 +186,6 @@ void loop() {
 
       if (cmd == "toit_1") {
         servoTarget = 180;
-        servoPosition = 110;
 
         if (!servoAttached) {
           servo.attach(SERVO_PIN);   // attache le servo
@@ -191,7 +194,6 @@ void loop() {
       }
       else if (cmd == "toit_0") {
         servoTarget = 110;
-        servoPosition = 180;
 
         if (!servoAttached) {
           servo.attach(SERVO_PIN);   // attache le servo
