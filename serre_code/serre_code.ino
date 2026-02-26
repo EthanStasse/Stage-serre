@@ -84,7 +84,7 @@ void loop() {
   bool soilDry = soilValue < SOIL_DRY_THRESHOLD;
 
   /* ====== LUMIERE ====== */
-  int lightValue = digitalRead(LIGHT_SENSOR_PIN);
+  bool lightValue = digitalRead(LIGHT_SENSOR_PIN);
 
   /* ====== DHT ====== */
   if (now - lastDHTRead >= 2000) {
@@ -149,8 +149,8 @@ void loop() {
     }
   }
 
-  lcd.setCursor(0, 1);
-  lcd.print(soilValue);
+  //lcd.setCursor(0, 1);
+  //lcd.print(soilValue);
 
   /* ====== ENVOI JSON ====== */
   if (now - lastSerialTime >= SERIAL_INTERVAL) {
@@ -191,6 +191,9 @@ void loop() {
       }
       else if (cmd.startsWith("TIME:")) {
         int hour = cmd.substring(5).toInt(); 
+        hour++;
+        lcd.setCursor(0,1);
+        lcd.print(hour);
         if (hour < 7 || hour >= 20) {
           isDay = false;
         } else {

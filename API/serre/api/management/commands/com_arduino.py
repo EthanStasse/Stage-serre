@@ -33,6 +33,9 @@ class Command(BaseCommand):
         ser = self.connect_serial()
 
         while True:
+            # Current time for intervals
+            now_time = time.time()
+
             # -------- READ SERIAL DATA --------
             try:
                 line = ser.readline().decode('utf-8', errors='ignore').strip()
@@ -64,7 +67,15 @@ class Command(BaseCommand):
             except Exception:
                 pass  # silently ignore other errors
 
-            # -------- SEND COMMANDS TO ARDUINO --------
+            # -------- SEND CURRENT TIME --------
+            try:
+                cmd_time = time.strftime("TIME:%H", time.localtime())  
+                ser.write((cmd_time + "\n").encode("utf-8"))
+                ser.flush()
+            except Exception:
+                pass  # ignore errors sending time
+
+            # -------- SEND COMMANDS FROM FILE --------
             try:
                 if os.path.exists(CMD_FILE):
                     with open(CMD_FILE, "r") as f:
@@ -79,4 +90,5 @@ class Command(BaseCommand):
             except Exception:
                 pass  # ignore errors sending commands
 
+            # -------- WAIT BEFORE NEXT LOOP --------
             time.sleep(SERIAL_INTERVAL)
