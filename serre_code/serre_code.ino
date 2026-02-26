@@ -169,7 +169,7 @@ void loop() {
         servoPosition = 110;
 
         if (!servoAttached) {
-          servo.attach(SERVO_PIN);   // attache le servo sans changer la position actuelle
+          servo.attach(SERVO_PIN);   // attache le servo 
           servoAttached = true;
         }
 
@@ -181,10 +181,10 @@ void loop() {
         servoPosition = 180;
 
         if (!servoAttached) {
-          servo.attach(SERVO_PIN);   // attache le servo sans changer la position actuelle
+          servo.attach(SERVO_PIN);   // attache le servo 
           servoAttached = true;
         }
-            lcd.setCursor(0,1);
+        lcd.setCursor(0,1);
         lcd.print("ACK:toit_0");
 
       }
@@ -196,11 +196,20 @@ void loop() {
   }
 
   if(digitalRead(BUTTON_PIN) == HIGH){
-    servo.attach(SERVO_PIN);
-    servo.write(110);
-    delay(1000);
-    servo.detach();
-
+    bool i = 0;
+    if(i==0){
+      i = 1;
+      servo.attach(SERVO_PIN);
+      servo.write(110);
+      delay(1000);
+      servo.detach();
+    }else{
+      i = 0;
+      servo.attach(SERVO_PIN);
+      servo.write(180);
+      delay(1000);
+      servo.detach();
+    }
 
   }
 }
