@@ -68,23 +68,12 @@
     </div>
 
     <script>
-        const TOIT_OPEN_THRESHOLD = 90; // must match views.py
+        const TOIT_CLOSED_ANGLE = 110; // servo fermé
+        const TOIT_OPEN_ANGLE = 180;   // servo ouvert
 
         let autoRefreshEnabled = true;
-        let refreshInterval = 2000; // 2 secondes
+        let refreshInterval = 2000;
         let refreshTimer = null;
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
 
         function updateLastUpdate() {
             const now = new Date();
@@ -97,7 +86,6 @@
                 if (!lastResponse.ok) throw new Error('Erreur API');
                 const lastData = await lastResponse.json();
 
-                // Mettre à jour les cartes
                 updateCard('tempCard', lastData.temp.toFixed(1), '°C');
                 updateCard('humCard', lastData.hum.toFixed(1), '%');
                 updateCard('solCard', lastData.sol, '%');
@@ -107,15 +95,15 @@
                 updateCard('pompeCard', lastData.pompe, '');
                 updateCard('ledCard', lastData.led, '');
 
-                // Sync the roof button based on live servo angle
+                // Sync bouton toit selon l'angle réel du servo
                 const toitBtn = document.getElementById('toitBtn');
                 if (toitBtn) {
-                    const isOpen = lastData.servo >= TOIT_OPEN_THRESHOLD;
+                    const isOpen = lastData.servo >= TOIT_OPEN_ANGLE;
                     toitBtn.textContent = isOpen ? 'Fermer' : 'Ouvrir';
                     toitBtn.value = isOpen ? 'toit_0' : 'toit_1';
                 }
 
-                // Mettre à jour l'indicateur LED
+                // Indicateur LED
                 const ledIndicator = document.querySelector('.status-indicator');
                 const ledCard = document.getElementById('ledCard');
                 if (lastData.led && lastData.led === 'ON') {
@@ -128,7 +116,7 @@
                     ledCard.classList.add('inactive');
                 }
 
-                // Animation de mise à jour
+                // Animation
                 document.querySelectorAll('.card').forEach(card => {
                     card.style.animation = 'none';
                     setTimeout(() => {
@@ -136,9 +124,7 @@
                     }, 10);
                 });
 
-                // Cacher le message d'erreur si tout va bien
                 document.getElementById('errorMessage').style.display = 'none';
-
                 updateLastUpdate();
 
             } catch (error) {
@@ -161,46 +147,20 @@
             }
         }
 
-        function toggleAutoRefresh() {
-            autoRefreshEnabled = !autoRefreshEnabled;
-            const btn = document.getElementById('toggleAutoBtn');
-            if (autoRefreshEnabled) {
-                btn.textContent = '⏸️ Arrêter le rafraîchissement';
-                startAutoRefresh();
-            } else {
-                btn.textContent = '▶️ Reprendre le rafraîchissement';
-                clearInterval(refreshTimer);
-            }
-        }
-
         function startAutoRefresh() {
             clearInterval(refreshTimer);
             refreshTimer = setInterval(() => {
-                if (autoRefreshEnabled) {
-                    refreshData();
-                }
+                if (autoRefreshEnabled) refreshData();
             }, refreshInterval);
         }
 
-        function changeRefreshRate(value) {
-            refreshInterval = parseInt(value) * 1000;
-            document.getElementById('refreshRate').textContent = value;
-            if (autoRefreshEnabled) {
-                startAutoRefresh();
-            }
-        }
-
-        // Initialiser
         document.addEventListener('DOMContentLoaded', () => {
             refreshData();
             startAutoRefresh();
         });
 
-        // Rafraîchir quand on revient sur la page
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && autoRefreshEnabled) {
-                refreshData();
-            }
+            if (!document.hidden && autoRefreshEnabled) refreshData();
         });
     </script>
 </body>
