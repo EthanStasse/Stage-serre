@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Données Serre</title>
     <link rel="stylesheet" href="{% static 'style/style.css' %}">
-    
 </head>
 <body>
     <div class="container">
@@ -17,11 +16,11 @@
             <div class="status">
                 <form method="POST">
                     {% csrf_token %}
-                    {% if toit == 0 %}
-                         <button name="commande" value="toit_1">Ouvrir</button>
-                    {% elif toit == 1 %}
-                        <button name="commande" value="toit_0">Fermer</button>
-                    {% endif %}
+                    <button id="toitBtn"
+                            name="commande"
+                            value="{% if toit == 0 %}toit_1{% else %}toit_0{% endif %}">
+                        {% if toit == 0 %}Ouvrir{% else %}Fermer{% endif %}
+                    </button>
                 </form>
                 <div class="status-indicator"></div>
                 <div>
@@ -31,7 +30,6 @@
         </header>
 
         <div class="error-message" id="errorMessage"></div>
-
 
         <div class="data-grid">
             <div class="card" id="tempCard">
@@ -70,6 +68,8 @@
     </div>
 
     <script>
+        const TOIT_OPEN_THRESHOLD = 90; // must match views.py
+
         let autoRefreshEnabled = true;
         let refreshInterval = 2000; // 2 secondes
         let refreshTimer = null;
@@ -93,7 +93,6 @@
 
         async function refreshData() {
             try {
-                // Récupérer la dernière donnée
                 const lastResponse = await fetch('/api/last/');
                 if (!lastResponse.ok) throw new Error('Erreur API');
                 const lastData = await lastResponse.json();
@@ -108,7 +107,15 @@
                 updateCard('pompeCard', lastData.pompe, '');
                 updateCard('ledCard', lastData.led, '');
 
-                // Mettre à jour l'indicateur led (petit cercle) et la carte
+                // Sync the roof button based on live servo angle
+                const toitBtn = document.getElementById('toitBtn');
+                if (toitBtn) {
+                    const isOpen = lastData.servo >= TOIT_OPEN_THRESHOLD;
+                    toitBtn.textContent = isOpen ? 'Fermer' : 'Ouvrir';
+                    toitBtn.value = isOpen ? 'toit_0' : 'toit_1';
+                }
+
+                // Mettre à jour l'indicateur LED
                 const ledIndicator = document.querySelector('.status-indicator');
                 const ledCard = document.getElementById('ledCard');
                 if (lastData.led && lastData.led === 'ON') {
@@ -121,13 +128,16 @@
                     ledCard.classList.add('inactive');
                 }
 
-                // Ajouter une classe de mise à jour
+                // Animation de mise à jour
                 document.querySelectorAll('.card').forEach(card => {
                     card.style.animation = 'none';
                     setTimeout(() => {
                         card.style.animation = 'pulse 0.5s ease-in-out';
                     }, 10);
                 });
+
+                // Cacher le message d'erreur si tout va bien
+                document.getElementById('errorMessage').style.display = 'none';
 
                 updateLastUpdate();
 
@@ -143,7 +153,6 @@
             const valueElement = card.querySelector('.card-value');
             valueElement.textContent = value + (unit ? ' ' + unit : '');
 
-            // Ajouter des classes de couleur selon les valeurs
             card.classList.remove('warning', 'danger');
             if (cardId === 'tempCard' && parseFloat(value) > 30) {
                 card.classList.add('danger');
@@ -151,7 +160,6 @@
                 card.classList.add('warning');
             }
         }
-
 
         function toggleAutoRefresh() {
             autoRefreshEnabled = !autoRefreshEnabled;

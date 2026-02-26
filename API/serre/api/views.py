@@ -3,38 +3,33 @@ from rest_framework.response import Response
 from django.shortcuts import render
 from .models import Serre
 from .serializers import SerreSerializer
-import os
 
 CMD_FILE = '/tmp/serre_cmds.txt'
 
-# Simple variable to store roof state (0 = closed, 1 = open)
-# In production, you might store this in DB or session
-TOIT_STATE = 0
+# Angle threshold above which the roof is considered open
+TOIT_OPEN_THRESHOLD = 90
 
 
 def index(request):
-    global TOIT_STATE
-
     if request.method == "POST":
         valeur = request.POST.get("commande")
         if valeur:
             try:
-                # Queue the command for Arduino
                 with open(CMD_FILE, 'a') as f:
                     f.write(valeur + '\n')
                 print(f"[index] Command queued: {valeur}")
-
-                # Toggle the roof state
-                if TOIT_STATE == 0:
-                    TOIT_STATE = 1
-                else:
-                    TOIT_STATE = 0
-
             except Exception as e:
                 print(f"[index] Error: {e}")
 
-    # Pass the current roof state to the template
-    return render(request, "index.html", {'toit': TOIT_STATE})
+    # Derive roof state from the latest servo angle instead of a global variable
+    toit_ouvert = False
+    try:
+        latest = Serre.objects.latest('created_at')
+        toit_ouvert = latest.servo >= TOIT_OPEN_THRESHOLD
+    except Serre.DoesNotExist:
+        pass
+
+    return render(request, "index.html", {'toit': 1 if toit_ouvert else 0})
 
 
 @api_view(['GET'])
