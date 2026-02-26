@@ -7,9 +7,34 @@ import os
 
 CMD_FILE = '/tmp/serre_cmds.txt'
 
+# Simple variable to store roof state (0 = closed, 1 = open)
+# In production, you might store this in DB or session
+TOIT_STATE = 0
+
 
 def index(request):
-    return render(request, 'index.html')
+    global TOIT_STATE
+
+    if request.method == "POST":
+        valeur = request.POST.get("commande")
+        if valeur:
+            try:
+                # Queue the command for Arduino
+                with open(CMD_FILE, 'a') as f:
+                    f.write(valeur + '\n')
+                print(f"[index] Command queued: {valeur}")
+
+                # Toggle the roof state
+                if TOIT_STATE == 0:
+                    TOIT_STATE = 1
+                else:
+                    TOIT_STATE = 0
+
+            except Exception as e:
+                print(f"[index] Error: {e}")
+
+    # Pass the current roof state to the template
+    return render(request, "index.html", {'toit': TOIT_STATE})
 
 
 @api_view(['GET'])
@@ -45,18 +70,3 @@ def toit_cmd(request):
         return Response({'status': 'queued', 'cmd': cmd})
     except Exception as e:
         return Response({'error': str(e)}, status=500)
-
-
-def index(request):
-    if request.method == "POST":
-        valeur = request.POST.get("commande")
-
-        if valeur:
-            try:
-                with open(CMD_FILE, 'a') as f:
-                    f.write(valeur + '\n')
-                print(f"[index] Command queued: {valeur}")
-            except Exception as e:
-                print(f"[index] Error: {e}")
-
-    return render(request, "index.html")

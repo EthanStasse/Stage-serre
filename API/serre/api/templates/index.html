@@ -17,12 +17,12 @@
             <div class="status">
                 <form method="POST">
                     {% csrf_token %}
-                    {% if toit==0 %}
-                        <button name="commande" value="toit_1">Ouvrir</button>
-                    {% toit=1 elif toit==1 %}
+                    {% if toit == 0 %}
+                         <button name="commande" value="toit_1">Ouvrir</button>
+                    {% elif toit == 1 %}
                         <button name="commande" value="toit_0">Fermer</button>
-                    {% toit=0 endif %}
-</form>
+                    {% endif %}
+                </form>
                 <div class="status-indicator"></div>
                 <div>
                     <div class="last-update">Dernière mise à jour: <span id="lastUpdate">--:--:--</span></div>
