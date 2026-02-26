@@ -17,8 +17,11 @@
             <div class="status">
                 <form method="POST">
                     {% csrf_token %}
+                    <php>i=0if(i==0){</php>
                     <button name="commande" value="toit_1">Ouvrir</button>
+                    <php>i=1}else{</php>
                     <button name="commande" value="toit_0">Fermer</button>
+                    <php>i=0}</php>
                 </form>
                 <div class="status-indicator"></div>
                 <div>
