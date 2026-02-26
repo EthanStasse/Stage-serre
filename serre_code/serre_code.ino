@@ -9,7 +9,7 @@
 #define DHT_PIN 3
 #define SERVO_PIN 4
 #define PUMP_RELAY_PIN 6
-#define LIGHT_RELAY_PIN A0
+#define LIGHT_RELAY_PIN 2
 #define BUTTON_PIN 8
 
 /* ====== CAPTEURS ====== */
@@ -160,10 +160,10 @@ void loop() {
     
     }
 
-  //lcd.setCursor(0, 1);
-  //lcd.print(soilValue);
-  lcd.setCursor(0,1);
-  lcd.print(lightValue);
+  lcd.setCursor(0, 1);
+  lcd.print(soilValue);
+
+
 
   /* ====== ENVOI JSON ====== */
   if (now - lastSerialTime >= SERIAL_INTERVAL) {
