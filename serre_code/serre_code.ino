@@ -223,6 +223,9 @@ void loop() {
     servo.write(110);
     delay(1000);
     servo.detach();
+    digitalWrite(LIGHT_RELAY_PIN, HIGH);
+    delay(1000);
+    digitalWrite(LIGHT_RELAY_PIN, LOW);
 
 
   }
