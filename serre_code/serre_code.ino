@@ -51,8 +51,8 @@ unsigned long pumpLockStartTime = 0;
 
 /* ====== SERVO ETAT ====== */
 bool servoAttached = false;
-int servoPosition;   // position actuelle (ne pas initialiser pour garder la position physique)
-int servoTarget;     // position cible
+int servoTarget = 110;     // position cible
+int servoPosition = servoTarget;   // position actuelle
 
 /* ====== SERIAL ====== */
 String cmd = "";
