@@ -17,6 +17,8 @@ http://192.168.0.10:8000/api/
 source venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install Django==6.0.2
+pip install djangorestframework
+pip install pyserial
 
 python3 manage.py makemigrations
 python3 manage.py migrate
@@ -29,5 +31,4 @@ Pour lancer le serveur:
         
     Aller dans API
     source venv/bin/activate    
-    aller dans API/serre
     python3 start.py

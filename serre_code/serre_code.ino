@@ -42,6 +42,7 @@ float lastTemp = NAN;
 float lastHum = NAN;
 
 bool isDay = true;
+bool isOn = false;
 
 /* ====== POMPE ====== */
 bool pumpRunning = false;
@@ -84,7 +85,7 @@ void loop() {
   bool soilDry = soilValue < SOIL_DRY_THRESHOLD;
 
   /* ====== LUMIERE ====== */
- int lightValue = analogRead(LIGHT_SENSOR_PIN);
+  int lightValue = analogRead(LIGHT_SENSOR_PIN);
 
   /* ====== DHT ====== */
   if (now - lastDHTRead >= 2000) {
@@ -150,15 +151,17 @@ void loop() {
   }
 
 
-  if(isDay == true && lightValue<200){
+  if (isDay == true && lightValue < 300) {
 
     digitalWrite(LIGHT_RELAY_PIN, HIGH);
-    
-    }else if(lightValue>500){
+    isOn = true;
 
-       digitalWrite(LIGHT_RELAY_PIN, LOW);
-    
-    }
+  } else if (lightValue > 690) {
+
+    digitalWrite(LIGHT_RELAY_PIN, LOW);
+    isOn = false;
+
+  }
 
   lcd.setCursor(0, 1);
   lcd.print(soilValue);
@@ -174,10 +177,10 @@ void loop() {
     Serial.print("\"temp\":"); Serial.print(temp); Serial.print(",");
     Serial.print("\"hum\":"); Serial.print(humAir); Serial.print(",");
     Serial.print("\"lumiere\":"); Serial.print(lightValue); Serial.print(",");
-    Serial.print("\"periode\":\""); Serial.print(isDay ? "day" : "night"); Serial.print("\",");
+    Serial.print("\"periode\":\""); Serial.print(isDay ? "jour" : "nuit"); Serial.print("\",");
     Serial.print("\"servo\":"); Serial.print(servoPosition); Serial.print(",");
     Serial.print("\"pompe\":\""); Serial.print(pumpRunning ? "ON" : "OFF"); Serial.print("\",");
-    Serial.print("\"led\":\""); Serial.print(!isDay && lightValue == LOW ? "ON" : "OFF"); Serial.print("\"");
+    Serial.print("\"led\":\""); Serial.print(isOn ? "ON" : "OFF"); Serial.print("\"");
     Serial.println("}");
   }
 
@@ -203,7 +206,7 @@ void loop() {
         }
       }
       else if (cmd.startsWith("TIME:")) {
-        int hour = cmd.substring(5).toInt(); 
+        int hour = cmd.substring(5).toInt();
         hour++;
         if (hour < 7 || hour >= 20) {
           isDay = false;
