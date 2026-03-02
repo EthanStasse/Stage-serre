@@ -188,3 +188,7 @@ button:disabled {
     color: #666;
     font-size: 12px;
 }
+
+textarea {
+    resize: none;
+}
