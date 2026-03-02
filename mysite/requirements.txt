@@ -2,3 +2,4 @@ django
 djangorestframework
 pyserial
 environs
+mysqlclient
