@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Données Serre</title>
+    <link rel="stylesheet" href="{% static 'style/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Données Serre</h1>
+            </div>
+            <div class="status">
+                <form method="POST">
+                    {% csrf_token %}
+                    <button id="toitBtn"
+                            name="commande"
+                            value="{% if toit == 0 %}toit_1{% else %}toit_0{% endif %}">
+                        {% if toit == 0 %}Ouvrir{% else %}Fermer{% endif %}
+                    </button>
+                </form>
+                <div class="status-indicator"></div>
+                <div>
+                    <div class="last-update">Dernière mise à jour: <span id="lastUpdate">--:--:--</span></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="data-grid">
+            <div class="card" id="tempCard">
+                <div class="card-title">Température</div>
+                <div class="card-value">-- °C</div>
+            </div>
+            <div class="card" id="humCard">
+                <div class="card-title">Humidité Air</div>
+                <div class="card-value">-- %</div>
+            </div>
+            <div class="card" id="solCard">
+                <div class="card-title">Humidité Sol</div>
+                <div class="card-value">-- %</div>
+            </div>
+            <div class="card" id="lumiereCard">
+                <div class="card-title">Luminosité</div>
+                <div class="card-value">-- Lux</div>
+            </div>
+            <div class="card" id="ledCard">
+                <div class="card-title">LED</div>
+                <div class="card-value">--</div>
+            </div>
+            <div class="card" id="servoCard">
+                <div class="card-title">Servo</div>
+                <div class="card-value">-- °</div>
+            </div>
+            <div class="card" id="periodeCard">
+                <div class="card-title">Période</div>
+                <div class="card-value">--</div>
+            </div>
+            <div class="card" id="pompeCard">
+                <div class="card-title">Pompe</div>
+                <div class="card-value">--</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TOIT_CLOSED_ANGLE = 110; // servo fermé
+        const TOIT_OPEN_ANGLE = 180;   // servo ouvert
+
+        let autoRefreshEnabled = true;
+        let refreshInterval = 2000;
+        let refreshTimer = null;
+
+        function updateLastUpdate() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('fr-FR');
+        }
+
+        async function refreshData() {
+            try {
+                const lastResponse = await fetch('/api/last/');
+                if (!lastResponse.ok) throw new Error('Erreur API');
+                const lastData = await lastResponse.json();
+
+                updateCard('tempCard', lastData.temp.toFixed(1), '°C');
+                updateCard('humCard', lastData.hum.toFixed(1), '%');
+                updateCard('solCard', lastData.sol, '%');
+                updateCard('lumiereCard', lastData.lumière, 'Lux');
+                updateCard('servoCard', lastData.servo, '°');
+                updateCard('periodeCard', lastData.periode, '');
+                updateCard('pompeCard', lastData.pompe, '');
+                updateCard('ledCard', lastData.led, '');
+
+                // Sync bouton toit selon l'angle réel du servo
+                const toitBtn = document.getElementById('toitBtn');
+                if (toitBtn) {
+                    const isOpen = lastData.servo >= TOIT_OPEN_ANGLE;
+                    toitBtn.textContent = isOpen ? 'Fermer' : 'Ouvrir';
+                    toitBtn.value = isOpen ? 'toit_0' : 'toit_1';
+                }
+
+                // Indicateur LED
+                const ledIndicator = document.querySelector('.status-indicator');
+                const ledCard = document.getElementById('ledCard');
+                if (lastData.led && lastData.led === 'ON') {
+                    ledIndicator.style.backgroundColor = '#4CAF50';
+                    ledCard.classList.add('active');
+                    ledCard.classList.remove('inactive');
+                } else {
+                    ledIndicator.style.backgroundColor = '#999';
+                    ledCard.classList.remove('active');
+                    ledCard.classList.add('inactive');
+                }
+
+                // Animation
+                document.querySelectorAll('.card').forEach(card => {
+                    card.style.animation = 'none';
+                    setTimeout(() => {
+                        card.style.animation = 'pulse 0.5s ease-in-out';
+                    }, 10);
+                });
+
+                document.getElementById('errorMessage').style.display = 'none';
+                updateLastUpdate();
+
+            } catch (error) {
+                console.error('Erreur lors du rafraîchissement:', error);
+                document.getElementById('errorMessage').textContent = 'Erreur de connexion à l\'API: ' + error.message;
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+
+        function updateCard(cardId, value, unit) {
+            const card = document.getElementById(cardId);
+            const valueElement = card.querySelector('.card-value');
+            valueElement.textContent = value + (unit ? ' ' + unit : '');
+
+            card.classList.remove('warning', 'danger');
+            if (cardId === 'tempCard' && parseFloat(value) > 30) {
+                card.classList.add('danger');
+            } else if (cardId === 'humCard' && parseFloat(value) > 80) {
+                card.classList.add('warning');
+            }
+        }
+
+        function startAutoRefresh() {
+            clearInterval(refreshTimer);
+            refreshTimer = setInterval(() => {
+                if (autoRefreshEnabled) refreshData();
+            }, refreshInterval);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshData();
+            startAutoRefresh();
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && autoRefreshEnabled) refreshData();
+        });
+    </script>
+</body>
+</html>
