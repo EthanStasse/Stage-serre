@@ -15,3 +15,10 @@ class Serre(models.Model):
 
     def __str__(self):
         return f"Serre {self.id} - Sol: {self.sol}, Temp: {self.temp}, Hum: {self.hum}, Lumière: {self.lumière}, Période: {self.periode}, Servo: {self.servo}, Pompe: {self.pompe}, Led: {self.led}"
+
+class Usr(models.Model):
+    username = models.CharField(max_length=150, unique=True)
+    password = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.username
