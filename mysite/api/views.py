@@ -25,7 +25,13 @@ def sync_time(request):
         return Response({'status': 'queued', 'cmd': cmd})
     except Exception as e:
         return Response({'error': str(e)}, status=500)
-    
+
+
+def login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password") 
+ 
 
 def index(request):
     if request.method == "POST":
@@ -45,7 +51,7 @@ def index(request):
     except Serre.DoesNotExist:
         pass
 
-    return render(request, "i.html", {'toit': 1 if toit_ouvert else 0})
+    return render(request, "index.html", {'toit': 1 if toit_ouvert else 0})
 
 
 @api_view(['GET'])
