@@ -1,5 +1,4 @@
 django
 djangorestframework
 pyserial
-environs
-mysqlclient
+gunicorn
