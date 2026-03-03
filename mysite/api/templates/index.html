@@ -64,6 +64,10 @@
                 <div class="card-title">Pompe</div>
                 <div class="card-value">--</div>
             </div>
+            <div class="card" id="lockCard">
+                <div class="card-title">Pompe Lock</div>
+                <div class="card-value">-- s</div>
+            </div>
         </div>
     </div>
 
@@ -94,6 +98,7 @@
                 updateCard('periodeCard', lastData.periode, '');
                 updateCard('pompeCard', lastData.pompe, '');
                 updateCard('ledCard', lastData.led, '');
+                updateCard('lockCard', lastData.pompe_lock, 's');
 
                 // Sync bouton toit selon l'angle réel du servo
                 const toitBtn = document.getElementById('toitBtn');
