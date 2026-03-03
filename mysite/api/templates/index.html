@@ -30,12 +30,13 @@
         </header>
 
         <div class="error-message" id="errorMessage"></div>
-
+        
         <div class="data-grid">
             <div class="card" id="tempCard">
                 <div class="card-title">Température</div>
                 <div class="card-value">-- °C</div>
             </div>
+
             <div class="card" id="humCard">
                 <div class="card-title">Humidité Air</div>
                 <div class="card-value">-- %</div>
@@ -70,6 +71,21 @@
             </div>
         </div>
     </div>
+                <!-- connection logs -->
+            <div class="card" id="logsCard">
+                <div class="card-title">Dernières connexions</div>
+                <div class="card-value" id="logsContent">
+                    {% if log_lines %}
+                        <ul>
+                        {% for line in log_lines %}
+                            <li>{{ line }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <em>Aucune connexion</em>
+                    {% endif %}
+                </div>
+            </div>
     <script src="{% static 'js/index.js' %}"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@ from .models import Serre, Usr
 from .serializers import SerreSerializer
 from datetime import datetime
 from django.contrib.auth.hashers import check_password
+from .management.commands.logs import log_user_connection
 CMD_FILE = '/tmp/serre_cmds.txt'
 
 # 110 = fermé, 180 = ouvert
@@ -39,6 +40,8 @@ def login(request):
                 # Store user info in session
                 request.session['user_id'] = user.id
                 request.session['username'] = user.username
+                # Log the connection
+                log_user_connection(username)
                 return redirect('index')
             else:
                 raise Usr.DoesNotExist
@@ -72,7 +75,13 @@ def index(request):
     except Serre.DoesNotExist:
         pass
 
-    return render(request, "index.html", {'toit': 1 if toit_ouvert else 0})
+    # fetch recent logs
+    from .models import Logs
+    recent_logs = Logs.objects.order_by('-created_at')[:10]
+    # convert to simple strings for template
+    log_lines = [f"{log.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {log.username} {log.action}" for log in recent_logs]
+
+    return render(request, "index.html", {'toit': 1 if toit_ouvert else 0, 'log_lines': log_lines})
 
 
 # API pour récupérer les données de la dernière mesure de la serre
