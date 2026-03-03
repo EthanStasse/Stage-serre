@@ -9,15 +9,20 @@
 </head>
 <body2> 
     <div class="login-wrapper">
-        <form class="login-form">
+        <form class="login-form" method="POST">
+            {% csrf_token %}
             <a href="/index">
                 <button type="button">To index</button>
             </a>
 
             <p>login page</p>
+            
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
 
-            <input type="text" required>
-            <input type="password" required>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
 
             <button type="submit">Login</button>
         </form>
