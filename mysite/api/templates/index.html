@@ -64,6 +64,10 @@
                 <div class="card-title">Pompe</div>
                 <div class="card-value">--</div>
             </div>
+            <div class="card" id="lockCard">
+                <div class="card-title">Pompe Lock</div>
+                <div class="card-value">-- s</div>
+            </div>
         </div>
     </div>
 
@@ -94,6 +98,11 @@
                 updateCard('periodeCard', lastData.periode, '');
                 updateCard('pompeCard', lastData.pompe, '');
                 updateCard('ledCard', lastData.led, '');
+                if (lastData.pompe_lock == 0) {
+                    updateCard('lockCard', 'Not Locked');
+                } else {
+                    updateCard('lockCard','Locked : ', lastData.pompe_lock, 's');
+                }
 
                 // Sync bouton toit selon l'angle réel du servo
                 const toitBtn = document.getElementById('toitBtn');
@@ -102,6 +111,7 @@
                     toitBtn.textContent = isOpen ? 'Fermer' : 'Ouvrir';
                     toitBtn.value = isOpen ? 'toit_0' : 'toit_1';
                 }
+
 
                 // Indicateur LED
                 const ledIndicator = document.querySelector('.status-indicator');

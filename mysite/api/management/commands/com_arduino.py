@@ -51,7 +51,8 @@ class Command(BaseCommand):
                                 periode=data.get('periode', 'unknown'),
                                 servo=data.get('servo', 0),
                                 pompe=data.get('pompe', 'OFF'),
-                                led=data.get('led', 'OFF')
+                                led=data.get('led', 'OFF'),
+                                pompe_lock=data.get('pompe_lock', 0)
                             )
                             # ---------------- CLEANUP OLD RECORDS ----------------
                             total = Serre.objects.count()

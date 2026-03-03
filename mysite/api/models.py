@@ -11,6 +11,7 @@ class Serre(models.Model):
     servo = models.IntegerField()
     pompe = models.CharField(max_length=10)
     led = models.CharField(max_length=10, default='OFF')
+    pompe_lock = models.IntegerField(default=600)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -22,3 +23,10 @@ class Usr(models.Model):
 
     def __str__(self):
         return self.username
+
+class Logs(models.Model):
+    action = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Log {self.id}: {self.action}"
