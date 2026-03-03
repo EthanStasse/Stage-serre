@@ -48,6 +48,7 @@ bool pumpRunning = false;
 bool pumpLocked = false;
 unsigned long pumpStartTime = 0;
 unsigned long pumpLockStartTime = 0;
+int pumptime = PUMP_LOCK_TIME;
 
 /* ====== SERVO ETAT ====== */
 bool servoAttached = false;
@@ -101,6 +102,7 @@ void loop() {
 
   /* ====== POMPE ====== */
   if (pumpLocked && now - pumpLockStartTime >= PUMP_LOCK_TIME)
+    pumptime--;
     pumpLocked = false;
 
   if (!pumpLocked && !pumpRunning && soilDry) {
@@ -178,6 +180,7 @@ void loop() {
     Serial.print("\"servo\":"); Serial.print(servoPosition); Serial.print(",");
     Serial.print("\"pompe\":\""); Serial.print(pumpRunning ? "ON" : "OFF"); Serial.print("\",");
     Serial.print("\"led\":\""); Serial.print(!isDay && lightValue == LOW ? "ON" : "OFF"); Serial.print("\"");
+    Serial.print("\"pompe_lock\":\""); Serial.print(pumptime); Serial.print("\"");
     Serial.println("}");
   }
 
