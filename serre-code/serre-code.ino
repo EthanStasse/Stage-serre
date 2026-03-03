@@ -16,11 +16,11 @@
 #define DHT_TYPE DHT22
 
 /* ====== SEUILS ====== */
-#define SOIL_DRY_THRESHOLD 140
+#define SOIL_DRY_THRESHOLD 100
 #define TEMP_DAY_ON 22.0
 #define TEMP_NIGHT_ON 18.0
 
-#define PUMP_ON_TIME 20000UL
+#define PUMP_ON_TIME 1000UL
 #define PUMP_LOCK_TIME 600000UL
 #define SERIAL_INTERVAL 1000UL
 
@@ -48,6 +48,7 @@ bool pumpRunning = false;
 bool pumpLocked = false;
 unsigned long pumpStartTime = 0;
 unsigned long pumpLockStartTime = 0;
+unsigned long pumptime = PUMP_LOCK_TIME / 1000;
 
 /* ====== SERVO ETAT ====== */
 bool servoAttached = false;
@@ -84,7 +85,7 @@ void loop() {
   bool soilDry = soilValue < SOIL_DRY_THRESHOLD;
 
   /* ====== LUMIERE ====== */
- int lightValue = analogRead(LIGHT_SENSOR_PIN);
+  int lightValue = analogRead(LIGHT_SENSOR_PIN);
 
   /* ====== DHT ====== */
   if (now - lastDHTRead >= 2000) {
@@ -100,15 +101,28 @@ void loop() {
   lcd.setRGB(soilDry ? 255 : 0, soilDry ? 165 : 255, 0);
 
   /* ====== POMPE ====== */
-  if (pumpLocked && now - pumpLockStartTime >= PUMP_LOCK_TIME)
-    pumpLocked = false;
 
+  // ----- HANDLE LOCK COUNTDOWN -----
+  if (pumpLocked) {
+
+    unsigned long elapsed = now - pumpLockStartTime;
+
+    if (elapsed >= PUMP_LOCK_TIME) {
+      pumpLocked = false;
+      pumptime = 0;  // countdown finished
+    } else {
+      pumptime = (PUMP_LOCK_TIME - elapsed) / 1000; // seconds remaining
+    }
+  }
+
+  // ----- START PUMP -----
   if (!pumpLocked && !pumpRunning && soilDry) {
     pumpRunning = true;
     pumpStartTime = now;
     digitalWrite(PUMP_RELAY_PIN, HIGH);
   }
 
+  // ----- STOP PUMP AFTER ON TIME -----
   if (pumpRunning && now - pumpStartTime >= PUMP_ON_TIME) {
     pumpRunning = false;
     pumpLocked = true;
@@ -125,7 +139,7 @@ void loop() {
     }
   }
 
-  if (temp < 15) {
+  if (temp < 20) {
     servoTarget = 110;
     if (!servoAttached) {
       servo.attach(SERVO_PIN);
@@ -150,15 +164,15 @@ void loop() {
   }
 
 
-  if(isDay == true && lightValue<300){
+  if (isDay == true && lightValue < 300) {
 
     digitalWrite(LIGHT_RELAY_PIN, HIGH);
-    
-    }else if(lightValue>690){
 
-       digitalWrite(LIGHT_RELAY_PIN, LOW);
-    
-    }
+  } else if (lightValue > 690) {
+
+    digitalWrite(LIGHT_RELAY_PIN, LOW);
+
+  }
 
   lcd.setCursor(0, 1);
   lcd.print(soilValue);
@@ -178,6 +192,7 @@ void loop() {
     Serial.print("\"servo\":"); Serial.print(servoPosition); Serial.print(",");
     Serial.print("\"pompe\":\""); Serial.print(pumpRunning ? "ON" : "OFF"); Serial.print("\",");
     Serial.print("\"led\":\""); Serial.print(!isDay && lightValue == LOW ? "ON" : "OFF"); Serial.print("\"");
+    Serial.print("\"pompe_lock\":\""); Serial.print(pumptime); Serial.print("\"");
     Serial.println("}");
   }
 
@@ -203,7 +218,7 @@ void loop() {
         }
       }
       else if (cmd.startsWith("TIME:")) {
-        int hour = cmd.substring(5).toInt(); 
+        int hour = cmd.substring(5).toInt();
         hour++;
         if (hour < 7 || hour >= 20) {
           isDay = false;
