@@ -94,6 +94,18 @@
         document.addEventListener('DOMContentLoaded', () => {
             refreshData();
             startAutoRefresh();
+
+            // Handle toit button click
+            const toitBtn = document.getElementById('toitBtn');
+            if (toitBtn) {
+                toitBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const form = toitBtn.closest('form');
+                    if (form) {
+                        form.submit();
+                    }
+                });
+            }
         });
 
         document.addEventListener('visibilitychange', () => {
