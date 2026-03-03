@@ -98,7 +98,11 @@
                 updateCard('periodeCard', lastData.periode, '');
                 updateCard('pompeCard', lastData.pompe, '');
                 updateCard('ledCard', lastData.led, '');
-                updateCard('lockCard', lastData.pompe_lock, 's');
+                if (lastData.pompe_lock === 600) {
+                    updateCard('lockCard', 'Not Locked', '');
+                } else {
+                    updateCard('lockCard','Locked for : ', lastData.pompe_lock, 's');
+                }
 
                 // Sync bouton toit selon l'angle réel du servo
                 const toitBtn = document.getElementById('toitBtn');
