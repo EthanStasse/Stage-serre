@@ -42,6 +42,7 @@ float lastTemp = NAN;
 float lastHum = NAN;
 
 bool isDay = true;
+bool LED_ON = false;
 
 /* ====== POMPE ====== */
 bool pumpRunning = false;
