@@ -127,7 +127,7 @@ void loop() {
     }
   }
 
-  if (temp < 20) {
+  if (temp < 15) {
     servoTarget = 110;
     if (!servoAttached) {
       servo.attach(SERVO_PIN);
