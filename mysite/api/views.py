@@ -33,14 +33,15 @@ def sync_time(request):
 def login(request):
     if request.method == "POST":
         username = request.POST.get("username")
-        password = check_password(request.POST.get("password"))
+        raw_password = request.POST.get("password")
         
         try:
-            user = Usr.objects.get(username=username, password=password)
-            # Login successful - redirect to index
-            return redirect('index')
+            user = Usr.objects.get(username=username)
+            if check_password(raw_password, user.password):
+                return redirect('index')
+            else:
+                raise Usr.DoesNotExist
         except Usr.DoesNotExist:
-            # Login failed - show error
             return render(request, "login.html", {'error': 'Invalid username or password'})
     
     return render(request, "login.html")
