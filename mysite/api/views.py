@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect
 from .models import Serre, Usr
 from .serializers import SerreSerializer
 from datetime import datetime
+from zoneinfo import ZoneInfo
+from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.hashers import check_password
 from .management.commands.logs import log_user_connection
@@ -17,8 +19,11 @@ TOIT_OPEN_ANGLE = 180
 # API pour synchroniser l'heure de l'Arduino avec celle du serveur
 @api_view(['POST'])
 def sync_time(request):
-    # use Django's timezone-aware local time
-    now = timezone.localtime(timezone.now())
+    # build a timezone-aware datetime using the standard library's zoneinfo
+    tz = ZoneInfo(settings.TIME_ZONE)
+    now = datetime.now(tz=tz)
+    # alternatively you could still call Django's helpers; they use zoneinfo under the hood
+    # now = timezone.localtime(timezone.now())
     cmd = now.strftime("TIME:%H")
 
     try:
@@ -81,7 +86,12 @@ def index(request):
     from .models import Logs
     recent_logs = Logs.objects.order_by('-created_at')[:10]
     # convert to simple strings for template
-    log_lines = [f"{log.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {log.username} {log.action}" for log in recent_logs]
+    # convert timestamps to local zone explicitly
+    log_lines = []
+    tz = ZoneInfo(settings.TIME_ZONE)
+    for log in recent_logs:
+        local_ts = log.created_at.astimezone(tz)
+        log_lines.append(f"{local_ts.strftime('%Y-%m-%d %H:%M:%S')} - {log.username} {log.action}")
 
     return render(request, "index.html", {'toit': 1 if toit_ouvert else 0, 'log_lines': log_lines})
 
