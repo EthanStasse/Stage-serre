@@ -11,7 +11,6 @@ class Serre(models.Model):
     servo = models.IntegerField()
     pompe = models.CharField(max_length=10)
     led = models.CharField(max_length=10, default='OFF')
-    pompe_lock = models.IntegerField(default=600)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

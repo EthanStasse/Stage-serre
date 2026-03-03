@@ -13,7 +13,7 @@ def seed_users(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('api', '0002_usr'),  
+        ('api', '0003_usr'),  
     ]
 
     operations = [
