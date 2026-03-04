@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.shortcuts import render, redirect
 from .models import Serre, Usr
@@ -6,6 +7,7 @@ from .serializers import SerreSerializer
 from datetime import datetime
 from django.contrib.auth.hashers import check_password
 from .management.commands.logs import log_user_action, log_user_connection
+
 CMD_FILE = '/tmp/serre_cmds.txt'
 
 # 110 = fermé, 180 = ouvert
@@ -45,7 +47,7 @@ def login(request):
             return render(request, "login.html", {'error': 'Invalid username or password'})
     
     return render(request, "login.html")
- 
+
 
 def index(request):
     if 'user_id' not in request.session:
@@ -77,6 +79,7 @@ def index(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_logs(request):
     from .models import Logs
     recent_logs = Logs.objects.order_by('-created_at')[:50]
@@ -88,6 +91,7 @@ def get_logs(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def last_serre(request):
     lastserre = Serre.objects.latest('created_at')
     serializer = SerreSerializer(lastserre)
