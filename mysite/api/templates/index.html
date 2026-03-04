@@ -18,7 +18,7 @@
                     {% csrf_token %}
                     <button id="toitBtn"
                             name="commande"
-                            value="{% if toit == 0 %}toit_1{% else %}toit_0{% endif %}">
+                            value="{% if toit == 0 %}toit_open{% else %}toit_close{% endif %}">
                         {% if toit == 0 %}Ouvrir{% else %}Fermer{% endif %}
                     </button>
                 </form>
