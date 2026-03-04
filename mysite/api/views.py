@@ -5,7 +5,7 @@ from .models import Serre, Usr
 from .serializers import SerreSerializer
 from datetime import datetime
 from django.contrib.auth.hashers import check_password
-from .management.commands.logs import log_user_action, log_user_connection
+from .management.commands.logs import log
 CMD_FILE = '/tmp/serre_cmds.txt'
 
 # 110 = fermé, 180 = ouvert
@@ -39,7 +39,7 @@ def login(request):
             if check_password(raw_password, user.password):
                 request.session['user_id'] = user.id
                 request.session['username'] = user.username
-                log_user_connection(username, 'logged in')
+                log(username, 'logged in')
                 return redirect('index')
             else:
                 raise Usr.DoesNotExist
@@ -93,7 +93,7 @@ def last_serre(request):
 # API pour commander le toit de la serre (ouvrir, fermer)
 @api_view(['POST'])
 def toit_cmd(request):
-    log_user_connection(request.session.get('username'), 'roof action')
+    log(request.session.get('username'), 'roof action')
     action = request.data.get('action')
     if not action:
         return Response({'error': 'missing action'}, status=400)
