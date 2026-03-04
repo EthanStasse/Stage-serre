@@ -63,10 +63,20 @@
             <div class="card" id="ledCard">
                 <div class="card-title">LED</div>
                 <div class="card-value">--</div>
+                <button id="ledBtn"
+                    name="commande"
+                    value="{% if led == 0 %}led_on{% else %}led_off{% endif %}">
+                    {% if led == 0 %}Allumer{% else %}Éteindre{% endif %}
+                </button>
             </div>
             <div class="card" id="pompeCard">
                 <div class="card-title">Pompe</div>
                 <div class="card-value">--</div>
+                <button id="pompeBtn"
+                    name="commande"
+                    value="{% if pompe == 0 %}pompe_on{% else %}pompe_off{% endif %}">
+                    {% if pompe == 0 %}Allumer{% else %}Éteindre{% endif %}
+                </button>
             </div>
             <div class="card" id="lockCard">
                 <div class="card-title">Pompe Lock</div>
