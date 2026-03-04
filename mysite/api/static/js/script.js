@@ -24,7 +24,7 @@ async function refreshData() {
         updateCard('periodeCard', lastData.periode, '');
         updateCard('pompeCard', lastData.pompe, '');
         updateCard('ledCard', lastData.led, '');
-        if (lastData.pompe_lock == 0) {
+        if (lastData.pompe_lock == 0 || lastData.pompe_lock == 600) {
             updateCard('lockCard', 'Not Locked');
         } else {
             updateCard('lockCard', 'Locked : ', lastData.pompe_lock, 's');
@@ -161,18 +161,19 @@ function initToggle() {
 
     function applyState() {
         var label = document.getElementById('modeLabel');
+        var toitBtn = document.getElementById('toitBtn');
         if (checkbox.checked) {
             switchEl.classList.add('is-checked');
-            label.textContent = '1';
+            if (label) label.textContent = '1';
+            if (toitBtn) toitBtn.style.display = 'block';
         } else {
             switchEl.classList.remove('is-checked');
-            label.textContent = '0';
+            if (label) label.textContent = '0';
+            if (toitBtn) toitBtn.style.display = 'none';
         }
     }
 
-    // use click on the label instead of change on input for better compatibility
     switchEl.addEventListener('click', function(e) {
-        // toggle manually since we intercept the click
         checkbox.checked = !checkbox.checked;
         applyState();
         e.preventDefault();

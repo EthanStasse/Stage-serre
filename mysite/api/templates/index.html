@@ -61,13 +61,11 @@
             <div class="card" id="servoCard">
                 <div class="card-title">Servo</div>
                 <div class="card-value">-- °</div>
-                {%if modeLabel == "1"%}
-                <button id="toitBtn"
-                    name="commande"
-                    value="{% if toit == 0 %}toit_open{% else %}toit_close{% endif %}">
+                <button id="toitBtn" name="commande"
+                    value="{% if toit == 0 %}toit_open{% else %}toit_close{% endif %}"
+                    style="display:none;">
                     {% if toit == 0 %}Ouvrir{% else %}Fermer{% endif %}
                 </button>
-                {% endif %}
             </div>
             <div class="card" id="ledCard">
                 <div class="card-title">LED</div>
