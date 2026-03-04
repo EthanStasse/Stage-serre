@@ -24,7 +24,7 @@ async function refreshData() {
         updateCard('periodeCard', lastData.periode, '');
         updateCard('pompeCard', lastData.pompe, '');
         updateCard('ledCard', lastData.led, '');
-        if (lastData.pompe_lock == 0) {
+        if (lastData.pompe_lock == 0 || lastData.pompe_lock == 600) {
             updateCard('lockCard', 'Not Locked');
         } else {
             updateCard('lockCard', 'Locked : ', lastData.pompe_lock, 's');
