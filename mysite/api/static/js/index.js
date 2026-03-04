@@ -31,6 +31,18 @@
                     updateCard('lockCard','Locked : ', lastData.pompe_lock, 's');
                 }
 
+                // update log card content if logs were returned
+                const logsContent = document.getElementById('logsContent');
+                if (logsContent && lastData.logs) {
+                    if (lastData.logs.length) {
+                        logsContent.innerHTML = '<ul>' +
+                            lastData.logs.map(l => `<li>${l}</li>`).join('') +
+                            '</ul>';
+                    } else {
+                        logsContent.innerHTML = '<em>Aucune donnée</em>';
+                    }
+                }
+
                 // Sync bouton toit selon l'angle réel du servo
                 const toitBtn = document.getElementById('toitBtn');
                 if (toitBtn) {

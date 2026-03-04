@@ -75,7 +75,7 @@ def index(request):
 
     # fetch recent logs
     from .models import Logs
-    recent_logs = Logs.objects.order_by('-created_at')
+    recent_logs = Logs.objects.order_by('-created_at')[:10]
     # convert to simple strings for template
     log_lines = [f"{log.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {log.username} {log.action}" for log in recent_logs]
 
@@ -87,7 +87,18 @@ def index(request):
 def last_serre(request):
     lastserre = Serre.objects.latest('created_at')
     serializer = SerreSerializer(lastserre)
-    return Response(serializer.data)
+
+    # include recent log lines so the frontend can refresh the logs card
+    from .models import Logs
+    recent_logs = Logs.objects.order_by('-created_at')[:10]
+    log_lines = [
+        f"{log.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {log.username} {log.action}"
+        for log in recent_logs
+    ]
+
+    data = serializer.data
+    data['logs'] = log_lines
+    return Response(data)
 
 
 # API pour commander le toit de la serre (ouvrir, fermer)
