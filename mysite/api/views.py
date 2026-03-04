@@ -63,7 +63,7 @@ def index(request):
             # optionally log LED commands specially
             if valeur in ('led_on', 'led_off'):
                 state = 'on' if valeur == 'led_on' else 'off'
-                log(request.session.get('username'), f'LED turned {state}')
+                log(request.session.get('username'), f'LED : {state}')
             try:
                 with open(CMD_FILE, 'a') as f:
                     f.write(valeur + '\n')
