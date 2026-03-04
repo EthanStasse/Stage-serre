@@ -60,13 +60,10 @@ def index(request):
     if request.method == "POST":
         valeur = request.POST.get("commande")
         if valeur:
+            # optionally log LED commands specially
             if valeur in ('led_on', 'led_off'):
                 state = 'on' if valeur == 'led_on' else 'off'
-                log(request.session.get('username'), f'LED : {state}')
-            elif valeur == 'toit_1':
-                log(request.session.get('username'), 'toit ouvert')
-            elif valeur == 'toit_0':
-                log(request.session.get('username'), 'toit fermé')
+                log(request.session.get('username'), f'LED turned {state}')
             try:
                 with open(CMD_FILE, 'a') as f:
                     f.write(valeur + '\n')
@@ -112,3 +109,29 @@ def last_serre(request):
     data = serializer.data
     data['logs'] = log_lines
     return Response(data)
+
+
+# API pour commander le toit de la serre (ouvrir, fermer)
+@api_view(['POST'])
+def toit_cmd(request):
+    action = request.data.get('action')
+    if action == "open":
+        log(request.session.get('username'), 'toit ouvert')
+    elif action == "close":
+        log(request.session.get('username'), 'toit fermé')
+    if not action:
+        return Response({'error': 'missing action'}, status=400)
+
+    action = action.lower()
+    if action not in ('open', 'close'):
+        return Response({'error': 'invalid action'}, status=400)
+    # Arduino firmware expects 'toit_1' (open) and 'toit_0' (close)
+    cmd_map = {'open': 'toit_1', 'close': 'toit_0'}
+    cmd = cmd_map[action]
+
+    try:
+        with open(CMD_FILE, 'a') as f:
+            f.write(cmd + '\n')
+        return Response({'status': 'queued', 'cmd': cmd})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)

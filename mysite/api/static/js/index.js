@@ -126,7 +126,7 @@
         async function sendToitCommand(action) {
             try {
                 const csrftoken = getCookie('csrftoken');
-                const resp = await fetch('/index/', {
+                const resp = await fetch('/api/toit/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
