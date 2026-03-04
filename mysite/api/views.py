@@ -12,6 +12,13 @@ CMD_FILE = '/tmp/serre_cmds.txt'
 TOIT_CLOSED_ANGLE = 110
 TOIT_OPEN_ANGLE = 180
 
+CMD_MAP = {
+    'led_on':  'led_1',
+    'led_off': 'led_0',
+    'toit_1':  'toit_1',
+    'toit_0':  'toit_0',
+}
+
 
 # API pour synchroniser l'heure de l'Arduino avec celle du serveur
 @api_view(['POST'])
@@ -60,14 +67,20 @@ def index(request):
     if request.method == "POST":
         valeur = request.POST.get("commande")
         if valeur:
-            # optionally log LED commands specially
-            if valeur in ('led_on', 'led_off'):
-                state = 'on' if valeur == 'led_on' else 'off'
-                log(request.session.get('username'), f'LED : {state}')
+            if valeur == 'led_on':
+                log(request.session.get('username'), 'LED : on')
+            elif valeur == 'led_off':
+                log(request.session.get('username'), 'LED : off')
+            elif valeur == 'toit_1':
+                log(request.session.get('username'), 'toit ouvert')
+            elif valeur == 'toit_0':
+                log(request.session.get('username'), 'toit fermé')
+
+            cmd = CMD_MAP.get(valeur, valeur)
             try:
                 with open(CMD_FILE, 'a') as f:
-                    f.write(valeur + '\n')
-                print(f"[index] Command queued: {valeur}")
+                    f.write(cmd + '\n')
+                print(f"[index] Command queued: {cmd}")
             except Exception as e:
                 print(f"[index] Error: {e}")
 
@@ -82,7 +95,6 @@ def index(request):
     # fetch recent logs
     from .models import Logs
     recent_logs = Logs.objects.order_by('-created_at')[:10]
-    # convert to simple strings for template
     log_lines = [f"{log.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {log.username} {log.action}" for log in recent_logs]
 
     return render(request, "index.html", {
@@ -98,7 +110,6 @@ def last_serre(request):
     lastserre = Serre.objects.latest('created_at')
     serializer = SerreSerializer(lastserre)
 
-    # include recent log lines so the frontend can refresh the logs card
     from .models import Logs
     recent_logs = Logs.objects.order_by('-created_at')[:10]
     log_lines = [
@@ -125,8 +136,34 @@ def toit_cmd(request):
     action = action.lower()
     if action not in ('open', 'close'):
         return Response({'error': 'invalid action'}, status=400)
-    # Arduino firmware expects 'toit_1' (open) and 'toit_0' (close)
     cmd_map = {'open': 'toit_1', 'close': 'toit_0'}
+    cmd = cmd_map[action]
+
+    try:
+        with open(CMD_FILE, 'a') as f:
+            f.write(cmd + '\n')
+        return Response({'status': 'queued', 'cmd': cmd})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+
+# API pour commander la LED de la serre (allumer, éteindre)
+@api_view(['POST'])
+def led_cmd(request):
+    action = request.data.get('action')
+    if not action:
+        return Response({'error': 'missing action'}, status=400)
+
+    action = action.lower()
+    if action not in ('on', 'off'):
+        return Response({'error': 'invalid action'}, status=400)
+
+    if action == 'on':
+        log(request.session.get('username'), 'LED : on')
+    else:
+        log(request.session.get('username'), 'LED : off')
+
+    cmd_map = {'on': 'led_1', 'off': 'led_0'}
     cmd = cmd_map[action]
 
     try:
