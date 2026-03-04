@@ -19,11 +19,6 @@
                 {% endif %}
                 <form method="POST">
                     {% csrf_token %}
-                    <button id="toitBtn"
-                            name="commande"
-                            value="{% if toit == 0 %}toit_open{% else %}toit_close{% endif %}">
-                        {% if toit == 0 %}Ouvrir{% else %}Fermer{% endif %}
-                    </button>
                 </form>
                 <div class="status-indicator"></div>
                 <div>
@@ -59,6 +54,11 @@
             <div class="card" id="servoCard">
                 <div class="card-title">Servo</div>
                 <div class="card-value">-- °</div>
+                <button id="toitBtn"
+                    name="commande"
+                    value="{% if toit == 0 %}toit_open{% else %}toit_close{% endif %}">
+                    {% if toit == 0 %}Ouvrir{% else %}Fermer{% endif %}
+                </button>
             </div>
             <div class="card" id="periodeCard">
                 <div class="card-title">Période</div>
