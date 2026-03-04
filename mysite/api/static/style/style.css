@@ -232,6 +232,8 @@ input[type="text"], input[type="password"] {
   opacity: 0;
   width: 0;
   height: 0;
+  appearance: none;        /* add this */
+  -webkit-appearance: none; /* add this */
 }
 
 .slider {
