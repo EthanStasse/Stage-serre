@@ -6,5 +6,4 @@ urlpatterns = [
     path('index/', views.index, name='index'),
     path('api/last/', views.last_serre),
     path('api/toit/', views.toit_cmd),
-    path('api/logs/', views.get_logs, name='get_logs'),
 ]

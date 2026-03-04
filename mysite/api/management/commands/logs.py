@@ -21,7 +21,6 @@ def get_connection_logs(limit=50):
         print(f"[ERROR] Failed to read logs: {e}")
         return []
     
-    
 def log_user_action(username, action):
     """Log a user action to the Logs model"""
     try:
