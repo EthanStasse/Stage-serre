@@ -25,11 +25,11 @@
                     <div class="last-update">Dernière mise à jour: <span id="lastUpdate">--:--:--</span></div>
                 </div>
                 <div>
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider round"></span>
-                        <span class="on">Manuel</span> 
-                        <span class="off">Autonome</span>
+                    <label class="switch" id="modeSwitch">
+                        <input type="checkbox" id="modeCheckbox">
+                        <span class="slider"></span>
+                        <span class="switch-label on">Manuel</span>
+                        <span class="switch-label off">Autonome</span>
                     </label>
                 </div>
             </div>
@@ -42,7 +42,6 @@
                 <div class="card-title">Température</div>
                 <div class="card-value">-- °C</div>
             </div>
-
             <div class="card" id="humCard">
                 <div class="card-title">Humidité Air</div>
                 <div class="card-value">-- %</div>
@@ -95,20 +94,20 @@
             </div>
         </div>
     </div>
-                <!-- connection logs -->
-            <div class="card" id="logsCard">
-                <div class="card-value" id="logsContent">
-                    {% if log_lines %}
-                        <ul>
-                        {% for line in log_lines %}
-                            <li>{{ line }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <em>Aucune donnée</em>
-                    {% endif %}
-                </div>
-            </div>
+    <!-- connection logs -->
+    <div class="card" id="logsCard">
+        <div class="card-value" id="logsContent">
+            {% if log_lines %}
+                <ul>
+                {% for line in log_lines %}
+                    <li>{{ line }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <em>Aucune donnée</em>
+            {% endif %}
+        </div>
+    </div>
     <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

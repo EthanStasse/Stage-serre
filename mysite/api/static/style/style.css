@@ -9,14 +9,12 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
-    
 }
 
 body2 {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -26,11 +24,9 @@ body2 {
     background: white;
     padding: 40px;
     border-radius: 15px;
-
     display: flex;
     flex-direction: column;
     gap: 20px;
-
     width: 300px;
 }
 
@@ -67,10 +63,10 @@ h1 {
     height: 12px;
     border-radius: 50%;
     background-color: #4CAF50;
-    animation: pulse 1.5s infinite;
+    animation: blink 1.5s infinite;
 }
 
-@keyframes pulse {
+@keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
@@ -114,18 +110,10 @@ h1 {
     color: #667eea;
 }
 
-.card.warning .card-value {
-    color: #ff9800;
-}
-
-.card.danger .card-value {
-    color: #f44336;
-}
-
+.card.warning .card-value { color: #ff9800; }
+.card.danger .card-value  { color: #f44336; }
 .card.active .card-value,
-.card.inactive .card-value {
-    color: #667eea;
-}
+.card.inactive .card-value { color: #667eea; }
 
 .history-section {
     background: white;
@@ -140,35 +128,12 @@ h1 {
     font-size: 20px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-thead {
-    background-color: #667eea;
-    color: white;
-}
-
-th {
-    padding: 12px;
-    text-align: left;
-    font-weight: 600;
-}
-
-td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-}
-
-tbody tr:hover {
-    background-color: #f5f5f5;
-}
-
-.timestamp {
-    color: #999;
-    font-size: 12px;
-}
+table { width: 100%; border-collapse: collapse; }
+thead { background-color: #667eea; color: white; }
+th { padding: 12px; text-align: left; font-weight: 600; }
+td { padding: 12px; border-bottom: 1px solid #eee; }
+tbody tr:hover { background-color: #f5f5f5; }
+.timestamp { color: #999; font-size: 12px; }
 
 .error-message {
     background: #f44336;
@@ -179,11 +144,7 @@ tbody tr:hover {
     display: none;
 }
 
-.controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
+.controls { display: flex; gap: 10px; margin-bottom: 20px; }
 
 button {
     padding: 10px 20px;
@@ -196,20 +157,10 @@ button {
     font-weight: 600;
     transition: background-color 0.2s;
 }
+button:hover { background-color: #764ba2; }
+button:disabled { background-color: #999; cursor: not-allowed; }
 
-button:hover {
-    background-color: #764ba2;
-}
-
-button:disabled {
-    background-color: #999;
-    cursor: not-allowed;
-}
-
-.refresh-rate {
-    color: #666;
-    font-size: 12px;
-}
+.refresh-rate { color: #666; font-size: 12px; }
 
 input[type="text"], input[type="password"] {
     padding: 10px;
@@ -217,93 +168,67 @@ input[type="text"], input[type="password"] {
     border-radius: 10px;
     font-size: 14px;
     width: 90%;
-    margin : 10px
+    margin: 10px;
 }
 
-/* Toggle switch */
+/* Toggle switch — JS-driven, no CSS sibling tricks */
 .switch {
-  position: relative;
-  display: inline-block;
-  width: 100px;
-  height: 34px;
+    position: relative;
+    display: inline-block;
+    width: 100px;
+    height: 34px;
+    cursor: pointer;
+    user-select: none;
 }
 
 .switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  appearance: none;        /* add this */
-  -webkit-appearance: none; /* add this */
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
 }
 
 .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: .4s;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: background-color .4s;
 }
 
 .slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform .4s;
 }
 
-input:checked + .slider {
-  background-color: #2196F3;
+.switch.is-checked .slider {
+    background-color: #2196F3;
 }
 
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+.switch.is-checked .slider:before {
+    transform: translateX(66px);
 }
 
-input:checked + .slider:before {
-  transform: translateX(66px); 
+.switch-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    font-family: Verdana, sans-serif;
+    font-weight: bold;
+    color: white;
+    pointer-events: none;
 }
 
-.slider.round {
-  border-radius: 34px;
-}
+.switch-label.on  { left: 8px;  display: none; }
+.switch-label.off { right: 6px; display: block; }
 
-.slider.round:before {
-  border-radius: 50%;
-}
-
-.on, .off {
-  color: white;
-  position: absolute;
-  top: 50%;
-  font-size: 10px;
-  font-family: Verdana, sans-serif;
-  font-weight: bold;
-  pointer-events: none;
-  transform: translateY(-50%);
-}
-
-/* "Auto" shows on the left when checked */
-.on {
-  display: none;
-  left: 8px;
-}
-
-/* "Manuel" shows on the right when unchecked */
-.off {
-  right: 6px;
-}
-
-input:checked ~ .on {
-  display: block;
-}
-
-input:checked ~ .off {
-  display: none;
-}
+.switch.is-checked .switch-label.on  { display: block; }
+.switch.is-checked .switch-label.off { display: none; }
