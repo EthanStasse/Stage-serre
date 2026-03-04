@@ -164,7 +164,7 @@ void loop() {
     }
   }
 
-
+/*
   if (isDay == true && lightValue < 300) {
 
     digitalWrite(LIGHT_RELAY_PIN, HIGH);
@@ -176,7 +176,7 @@ void loop() {
     LED_ON = false;
 
   }
-
+*/
   lcd.setCursor(0, 1);
   lcd.print(soilValue);
 
