@@ -21,12 +21,3 @@ def get_connection_logs(limit=50):
         print(f"[ERROR] Failed to read logs: {e}")
         return []
     
-def log_user_action(username, action):
-    """Log a user action to the Logs model"""
-    try:
-        Logs.objects.create(
-            username=username,
-            action=action
-        )
-    except Exception as e:
-        print(f"[ERROR] Failed to log user action: {e}")

@@ -93,12 +93,8 @@ def last_serre(request):
 # API pour commander le toit de la serre (ouvrir, fermer)
 @api_view(['POST'])
 def toit_cmd(request):
+    log_user_connection(request.session.get('username'), 'roof action')
     action = request.data.get('action')
-    if action == "toit_open":
-        log_user_connection(request.session.get('username'), 'opened the roof')
-    elif action == "toit_close":
-        log_user_connection(request.session.get('username'), 'closed the roof')
-
     if not action:
         return Response({'error': 'missing action'}, status=400)
 
