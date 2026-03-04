@@ -31,18 +31,6 @@
                     updateCard('lockCard','Locked : ', lastData.pompe_lock, 's');
                 }
 
-                // update log card content if logs were returned
-                const logsContent = document.getElementById('logsContent');
-                if (logsContent) {
-                    if (lastData.logs && lastData.logs.length) {
-                        logsContent.innerHTML = '<ul>' +
-                            lastData.logs.map(l => `<li>${l}</li>`).join('') +
-                            '</ul>';
-                    } else {
-                        logsContent.innerHTML = '<em>Aucune connexion</em>';
-                    }
-                }
-
                 // Sync bouton toit selon l'angle réel du servo
                 const toitBtn = document.getElementById('toitBtn');
                 if (toitBtn) {
@@ -143,8 +131,6 @@
                         toitBtn.value = 'toit_1';
                     }
                 }
-                // refresh immediately so logs card updates right away
-                refreshData();
             } catch (e) {
                 console.error('[Toit] failed to send command:', e);
                 const em = document.getElementById('errorMessage');
