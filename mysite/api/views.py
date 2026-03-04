@@ -60,6 +60,10 @@ def index(request):
     if request.method == "POST":
         valeur = request.POST.get("commande")
         if valeur:
+            # optionally log LED commands specially
+            if valeur in ('led_on', 'led_off'):
+                state = 'on' if valeur == 'led_on' else 'off'
+                log(request.session.get('username'), f'LED turned {state}')
             try:
                 with open(CMD_FILE, 'a') as f:
                     f.write(valeur + '\n')
@@ -67,9 +71,11 @@ def index(request):
             except Exception as e:
                 print(f"[index] Error: {e}")
 
+    led_state = False
     try:
         latest = Serre.objects.latest('created_at')
         toit_ouvert = latest.servo >= TOIT_OPEN_ANGLE
+        led_state = (latest.led == 'ON')
     except Serre.DoesNotExist:
         pass
 
@@ -79,7 +85,11 @@ def index(request):
     # convert to simple strings for template
     log_lines = [f"{log.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {log.username} {log.action}" for log in recent_logs]
 
-    return render(request, "index.html", {'toit': 1 if toit_ouvert else 0, 'log_lines': log_lines})
+    return render(request, "index.html", {
+        'toit': 1 if toit_ouvert else 0,
+        'led': 1 if led_state else 0,
+        'log_lines': log_lines
+    })
 
 
 # API pour récupérer les données de la dernière mesure de la serre

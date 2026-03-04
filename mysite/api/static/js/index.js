@@ -51,6 +51,14 @@
                     toitBtn.value = isOpen ? 'toit_0' : 'toit_1';
                 }
 
+                // Sync LED button
+                const ledBtn = document.getElementById('ledBtn');
+                if (ledBtn) {
+                    const isOn = lastData.led === 'ON';
+                    ledBtn.textContent = isOn ? 'Éteindre' : 'Allumer';
+                    ledBtn.value = isOn ? 'led_off' : 'led_on';
+                }
+
 
                 // Indicateur LED
                 const ledIndicator = document.querySelector('.status-indicator');

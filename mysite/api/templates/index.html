@@ -63,11 +63,14 @@
             <div class="card" id="ledCard">
                 <div class="card-title">LED</div>
                 <div class="card-value">--</div>
-                <button id="ledBtn"
-                    name="commande"
-                    value="{% if led == 0 %}led_on{% else %}led_off{% endif %}">
-                    {% if led == 0 %}Allumer{% else %}Éteindre{% endif %}
-                </button>
+                <form method="POST">
+                    {% csrf_token %}
+                    <button id="ledBtn"
+                        name="commande"
+                        value="{% if led == 1 %}led_off{% else %}led_on{% endif %}">
+                        {% if led == 1 %}Éteindre{% else %}Allumer{% endif %}
+                    </button>
+                </form>
             </div>
             <div class="card" id="pompeCard">
                 <div class="card-title">Pompe</div>
