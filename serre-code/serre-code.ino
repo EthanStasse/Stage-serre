@@ -229,6 +229,14 @@ void loop() {
           isDay = true;
         }
       }
+      else if (cmd == "led_on") {
+        digitalWrite(LIGHT_RELAY_PIN, HIGH);
+        LED_ON = true;
+      }
+      else if (cmd == "led_off") {
+        digitalWrite(LIGHT_RELAY_PIN, LOW);
+        LED_ON = false;
+      }
 
       cmd = "";
     } else {
