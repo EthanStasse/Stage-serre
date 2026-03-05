@@ -79,6 +79,7 @@ async function refreshData() {
 
 function updateCard(cardId, value, unit) {
     const card = document.getElementById(cardId);
+    if (!card) return;
     const valueElement = card.querySelector('.card-value');
     valueElement.textContent = value + (unit ? ' ' + unit : '');
 
