@@ -262,3 +262,11 @@ document.addEventListener('visibilitychange', function() {
     if (!document.hidden && autoRefreshEnabled) refreshData();
 });
 
+var HomeBtn = document.getElementById('HomeBtn');
+    if(HomeBtn){
+        HomeBtn.addEventListener('click', function(e){
+            e.preventDefault();
+            window.location.href = '/index/';
+        })
+    }
+

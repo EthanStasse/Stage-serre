@@ -8,6 +8,24 @@
     <link rel="stylesheet" href="{% static 'style/style.css' %}">
 </head>
 <body>
+
+            <header>
+            <div>
+                <h1>Données Serre</h1>
+            </div>
+            <div class="status">
+                {% if request.session.username %}
+                    <p>Connecté en tant que {{ request.session.username }}</p>
+                {% endif %}
+                {% if request.session.username == "admin" %}
+                <button id="HomeBtn"
+                    name="Home"
+                    value="Home">
+                    Home
+                </button>
+                {% endif %}
+        </header>
+
     <!-- connection logs -->
     <div class="card" id="logsCard">
         <div class="card-value" id="logsContent">
