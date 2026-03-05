@@ -57,7 +57,7 @@ int servoTarget = 110;
 int servoPosition = servoTarget;
 
 /* ====== MODE ====== */
-bool Mode = false;  // true = Manuel, false = Autonome
+bool Mode = true;  // true = Auto, false = Manuel
 
 /* ====== SERIAL ====== */
 String cmd = "";
@@ -242,12 +242,12 @@ void loop() {
       }
       else if (cmd == "mode_manuel"){
 
-        Mode = true;
+        Mode = false;
 
       }
       else if (cmd == "mode_auto"){
 
-        Mode = false;
+        Mode = true;
 
       }
 
