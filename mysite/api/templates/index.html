@@ -17,6 +17,11 @@
                 {% if request.session.username %}
                     <p>Connecté en tant que {{ request.session.username }}</p>
                 {% endif %}
+                <button id="deconnexionBtn"
+                    name="logout"
+                    value="deconnexion">
+                    Deconnexion
+                </button>
                 <form method="POST">
                     {% csrf_token %}
                 </form>
