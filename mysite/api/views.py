@@ -121,7 +121,7 @@ def last_serre(request):
     lastserre = Serre.objects.latest('created_at')
     serializer = SerreSerializer(lastserre)
 
-    recent_logs = Logs.objects.order_by('-created_at')[:10]
+    recent_logs = Logs.objects.order_by('-created_at')
     log_lines = [
         f"{l.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {l.username} {l.action}"
         for l in recent_logs
