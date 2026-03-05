@@ -110,7 +110,7 @@ def logs(request):
         else:
             return redirect('login')
             # fetch recent logs
-    recent_logs = Logs.objects.order_by('-created_at')[:10]
+    recent_logs = Logs.objects.order_by('-created_at')
     log_lines = [f"{log.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {log.username} {log.action}" for log in recent_logs]
     return render(request, "logs.html", {'logs': log_lines})
 
@@ -121,7 +121,7 @@ def last_serre(request):
     serializer = SerreSerializer(lastserre)
 
     from .models import Logs
-    recent_logs = Logs.objects.order_by('-created_at')[:10]
+    recent_logs = Logs.objects.order_by('-created_at')
     log_lines = [
         f"{log.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {log.username} {log.action}"
         for log in recent_logs
