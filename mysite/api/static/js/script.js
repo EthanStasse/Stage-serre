@@ -166,10 +166,14 @@ function initToggle() {
             switchEl.classList.add('is-checked');
             if (label) label.textContent = '1';
             if (toitBtn) toitBtn.style.display = 'block';
+            if (ledBtn) ledBtn.style.display = 'block';
+            if (pompeBtn) pompeBtn.style.display = 'block';
         } else {
             switchEl.classList.remove('is-checked');
             if (label) label.textContent = '0';
             if (toitBtn) toitBtn.style.display = 'none';
+            if (ledBtn) ledBtn.style.display = 'none';  
+            if (pompeBtn) pompeBtn.style.display = 'none';
         }
     }
 
