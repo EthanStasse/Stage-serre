@@ -249,6 +249,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+var logsBtn = document.getElementById('logsBtn');
+    if (logsBtn) {
+        logsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/logs/';
+        });
+    }
+
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden && autoRefreshEnabled) refreshData();
 });
+

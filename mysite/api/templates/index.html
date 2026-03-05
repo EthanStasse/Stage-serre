@@ -108,20 +108,6 @@
             </div>
         </div>
     </div>
-    <!-- connection logs -->
-    <div class="card" id="logsCard">
-        <div class="card-value" id="logsContent">
-            {% if log_lines %}
-                <ul>
-                {% for line in log_lines %}
-                    <li>{{ line }}</li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <em>Aucune donnée</em>
-            {% endif %}
-        </div>
-    </div>
     <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
