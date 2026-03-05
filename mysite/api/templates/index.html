@@ -79,7 +79,8 @@
                     {% csrf_token %}
                     <button id="ledBtn"
                         name="commande"
-                        value="{% if led == 1 %}led_off{% else %}led_on{% endif %}">
+                        value="{% if led == 1 %}led_off{% else %}led_on{% endif %}"
+                        style= "display:none;">
                         {% if led == 1 %}Éteindre{% else %}Allumer{% endif %}
                     </button>
                 </form>
@@ -89,7 +90,8 @@
                 <div class="card-value">--</div>
                 <button id="pompeBtn"
                     name="commande"
-                    value="{% if pompe == 0 %}pompe_on{% else %}pompe_off{% endif %}">
+                    value="{% if pompe == 0 %}pompe_on{% else %}pompe_off{% endif %}"
+                    style="display:none;">
                     {% if pompe == 0 %}Allumer{% else %}Éteindre{% endif %}
                 </button>
             </div>
