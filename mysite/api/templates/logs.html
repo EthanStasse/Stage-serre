@@ -4,44 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Données Serre</title>
+    <title>Logs</title>
     <link rel="stylesheet" href="{% static 'style/style.css' %}">
 </head>
 <body>
-
-            <header>
-            <div>
-                <h1>Données Serre</h1>
-            </div>
-            <div class="status">
-                {% if request.session.username %}
-                    <p>Connecté en tant que {{ request.session.username }}</p>
-                {% endif %}
-                {% if request.session.username == "admin" %}
-                <button id="HomeBtn"
-                    name="Home"
-                    value="Home">
-                    Home
-                </button>
-                {% endif %}
-        </header>
+    <header>
+        <div>
+            <h1>Logs</h1>
+        </div>
+        <div class="status">
+            {% if request.session.username %}
+                <p>Connecté en tant que {{ request.session.username }}</p>
+            {% endif %}
+            <a href="{% url 'index' %}"><button>Home</button></a>
+        </div>
+    </header>
 
     <div class="card" id="sortCard">
         <div class="card-title">Trier par utilisateur</div>
-        <select name="user_filter" id="userFilter">
-            <option value="">Tous</option>
-            {% for user in users %}
-                <option value="{{ user.username }}">{{ user.username }}</option>
-            {% endfor %}
-        </select>
+        <form method="GET" action="">
+            <select name="user_filter" id="userFilter" onchange="this.form.submit()">
+                <option value="">Tous</option>
+                {% for user in users %}
+                    <option value="{{ user.username }}" {% if selected_user == user.username %}selected{% endif %}>
+                        {{ user.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
     </div>
 
-    <!-- connection logs -->
     <div class="card" id="logsCard">
         <div class="card-value" id="logsContent">
-            {% if logs %}
+            {% if log_lines %}
                 <ul>
-                {% for line in logs %}
+                {% for line in log_lines %}
                     <li>{{ line }}</li>
                 {% endfor %}
                 </ul>
