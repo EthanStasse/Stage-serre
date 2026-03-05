@@ -221,14 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = '/logout/';
         });
     }
-
-    var refreshLogsBtn = document.getElementById('refreshLogsBtn');
-    if (refreshLogsBtn) {
-        refreshLogsBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            refreshData();
-        });
-    }
 });
 
 document.addEventListener('visibilitychange', function() {
