@@ -225,7 +225,7 @@ def pompe_cmd(request):
 
     log(request.session.get('username', 'inconnu'), f'Pompe : {action}')
 
-    cmd = {'on': 'pompe_1', 'off': 'pompe_0'}[action]
+    cmd = {'on': 'pompe_on', 'off': 'pompe_off'}[action]
     try:
         with open(CMD_FILE, 'a') as f:
             f.write(cmd + '\n')
