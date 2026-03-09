@@ -107,18 +107,20 @@
                 <div class="card-value">-- s</div>
             </div>
         </div>
-        <div id="webGL"></div>
-            <script type="importmap">
-                {
-                    "imports": {
-                        "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
-                        "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
-                    }
+<div id="webGL"></div>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+                    "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
                 }
-            </script>
-        </div>
+            }
+        </script>
 
-
+    <script>
+        const LOGIN_TIME = {{ login_time }};
+        const SESSION_TIMEOUT = 3600;
+    </script>
     <script type="module" src="{% static 'js/WebGL.js' %}"></script>
     <script src="{% static 'js/script.js' %}"></script>
 </body>

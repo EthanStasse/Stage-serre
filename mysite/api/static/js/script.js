@@ -318,7 +318,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
+    // Auto-disconnect based on server login time
+    if (typeof LOGIN_TIME !== 'undefined') {
+        const elapsed = (Date.now() / 1000) - LOGIN_TIME;
+        const remaining = (SESSION_TIMEOUT - elapsed) * 1000;
+        if (remaining > 0) {
+            setTimeout(function() {
+                window.location.href = '/';
+            }, remaining);
+        } else {
+            window.location.href = '/';
+        }
+    }
 });
 
 document.addEventListener('visibilitychange', function() {

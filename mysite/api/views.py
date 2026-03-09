@@ -103,6 +103,7 @@ def index(request):
     return render(request, "index.html", {
         'toit': 1 if toit_ouvert else 0,
         'led': 1 if led_state else 0,
+        'login_time': int(request.session.get('login_time', 0)),
     })
 
 
@@ -212,6 +213,7 @@ def led_cmd(request):
         return Response({'status': 'queued', 'cmd': cmd})
     except Exception as e:
         return Response({'error': str(e)}, status=500)
+
 
 @api_view(['POST'])
 def pompe_cmd(request):
