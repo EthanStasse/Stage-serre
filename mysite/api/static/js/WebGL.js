@@ -73,7 +73,7 @@ function drawfloor(){
 function init() {
     var container = document.querySelector('.container');
     var canvasWidth = container.offsetWidth;
-    var canvasHeight = 494;
+    var canvasHeight = 700;
     var canvasRatio = canvasWidth / canvasHeight;
 
     renderer = new THREE.WebGLRenderer( { antialias: true } );
