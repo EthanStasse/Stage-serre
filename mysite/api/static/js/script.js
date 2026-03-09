@@ -324,8 +324,3 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden && autoRefreshEnabled && window.location.pathname !== '/logs/') refreshData();
 });
-
-// Auto-redirect to login after session timeout (no logout log)
-setTimeout(function() {
-    window.location.href = '/';
-}, 60 * 60 * 1000);
