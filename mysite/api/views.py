@@ -11,7 +11,7 @@ CMD_FILE = '/tmp/serre_cmds.txt'
 
 TOIT_CLOSED_ANGLE = 110
 TOIT_OPEN_ANGLE = 180
-SESSION_TIMEOUT = 3600
+SESSION_TIMEOUT = 1800
 
 CMD_MAP = {
     'led_on':  'led_1',

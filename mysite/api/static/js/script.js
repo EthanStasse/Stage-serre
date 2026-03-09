@@ -328,4 +328,4 @@ document.addEventListener('visibilitychange', function() {
 // Auto-redirect to login after session timeout (no logout log)
 setTimeout(function() {
     window.location.href = '/';
-}, 60 * 60 * 1000);
+}, 30 * 60 * 1000);
