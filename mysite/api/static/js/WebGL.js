@@ -82,8 +82,17 @@ function init() {
 
     camera = new THREE.PerspectiveCamera( 30, canvasRatio, 1, 10000 );
     cameraControls = new OrbitControls(camera, renderer.domElement);
-    camera.position.set(0, 500, 1500);
+    camera.position.set(0, 300, 1500);
     cameraControls.target.set(0, 43, -8);
+
+// Lock camera 
+    cameraControls.enablePan = false;
+    cameraControls.maxPolarAngle = Math.PI / 2.4;
+    cameraControls.minPolarAngle = Math.PI / 4;
+    cameraControls.minAzimuthAngle = -0.5;
+    cameraControls.maxAzimuthAngle = 0.5;
+    cameraControls.minDistance = 500;
+    cameraControls.maxDistance = 2000;
 }
 
 function addToDOM() {
