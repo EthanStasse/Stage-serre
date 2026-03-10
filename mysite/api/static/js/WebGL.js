@@ -216,7 +216,7 @@ function drawPot() {
 
 function drawPlantStem() {
     var material = new THREE.MeshPhongMaterial({ color: 0x228B22 });
-    var plant = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 80, 32), material);
+    var plant = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 80, 32), material);
     plant.position.set(potPosition.x, potPosition.y + 70, potPosition.z);
     // plant.castShadow = true; // shadow_code
     // plant.receiveShadow = true; // shadow_code
