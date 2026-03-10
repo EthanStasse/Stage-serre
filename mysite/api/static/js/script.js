@@ -29,6 +29,7 @@ async function refreshData() {
         updateCard('periodeCard', lastData.periode, '');
         updateCard('pompeCard', lastData.pompe, '');
         updateCard('ledCard', lastData.led, '');
+        if (window.setLedIntensity) window.setLedIntensity(lastData.led);
         if (lastData.pompe_lock == 0 || lastData.pompe_lock == 600) {
             updateCard('lockCard', 'Not Locked');
         } else {
