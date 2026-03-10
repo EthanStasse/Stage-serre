@@ -17,9 +17,7 @@ function fillScene() {
     light.position.set(-1300, 700, 1240);
     window.scene.add(light);
 
-    light = new THREE.DirectionalLight(0xFFFFFF, 0.7);
-    light.position.set(1000, -500, -1200);
-    window.scene.add(light);
+
 
     // var cubeLoader = new THREE.CubeTextureLoader().setPath('assets/skybox/');
     // cubeLoader.load(
@@ -294,7 +292,7 @@ ledLightPosition.forEach(pos => {
     var light = new THREE.SpotLight(0xFF0000, 0);
     light.position.set(pos.x, pos.y, pos.z);
     light.distance = 400;
-    light.angle = Math.PI / 20;
+    light.angle = Math.PI / 15;
     light.penumbra = 0.2;
     // light.castShadow = true; // shadow_code
 
