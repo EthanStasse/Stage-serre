@@ -30,7 +30,7 @@ function fillScene() {
     drawWall();
     drawfloor();
     drawSerreFloor();
-    drawSerreSideWalls();
+    drawSerreWalls();
 }
 
 function drawTable(){
@@ -82,15 +82,32 @@ function drawSerreFloor(){
     window.scene.add(floor);
 }
 
-function drawSerreSideWalls() {
-    var material = new THREE.MeshPhongMaterial({ color: 0xB68E65 });
 
-    var sideWallsPositions = [[185, 313.5, 350], [-185, 313.5, 350]];
+function drawSerreWalls(){
+
+    var material = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.2,
+        shininess: 100,
+        specular: 0xffffff,
+        side: THREE.DoubleSide
+    });
+
+    var wallsPossitions = [[0, 313.5, 250], [0, 313.5, 450]];
+    wallsPossitions.forEach(pos => {
+        var walls = new THREE.Mesh(new THREE.BoxGeometry(380, 172, 10), material);
+        walls.position.set(...pos);
+        window.scene.add(walls);
+    });
+
+        var sideWallsPositions = [[185, 313.5, 350], [-185, 313.5, 350]];
     sideWallsPositions.forEach(pos => {
         var sideWall = new THREE.Mesh(new THREE.BoxGeometry(10, 172, 200), material);
         sideWall.position.set(...pos);
         window.scene.add(sideWall);
     });
+
 }
 
 function init() {
