@@ -232,9 +232,9 @@ var toitTargetAngle = Math.PI / 2.6;
 
 window.setToitAngle = function(servoAngle) {
     if (servoAngle >= 180) {
-        toitTargetAngle = -2.2;
+        toitTargetAngle = -2.2;  // open
     } else {
-        toitTargetAngle = Math.PI / 2.6;
+        toitTargetAngle = Math.PI / 2.6;  // closed
     }
 };
 
