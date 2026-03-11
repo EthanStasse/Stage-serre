@@ -316,7 +316,7 @@ ledLightPosition.forEach(pos => {
     // light.castShadow = true; // shadow_code
 
     var ledTarget = new THREE.Object3D();
-    ledTarget.position.set(potPosition.x, potPosition.y+50, potPosition.z);
+    ledTarget.position.set(potPosition.x, potPosition.y+70, potPosition.z);
     window.scene.add(ledTarget);
     light.target = ledTarget;
 
