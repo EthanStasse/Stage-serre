@@ -249,6 +249,40 @@ function drawPlant() {
     // flower.castShadow = true; // shadow_code
     // flower.receiveShadow = true; // shadow_code
     window.scene.add(flower);
+
+    var leafTexture = Textureloader.load('/static/js/texture/Leaves.jpg');
+    var leafMaterial = new THREE.MeshPhongMaterial({ map: leafTexture, transparent: true });
+    var bottomLeafsLocation = [
+        { x: potPosition.x - 8, y: potPosition.y + 40, z: potPosition.z, rotationz: -(Math.PI/1.2) },
+        { x: potPosition.x + 8, y: potPosition.y + 40, z: potPosition.z, rotationz: Math.PI/1.2}
+    ];
+    bottomLeafsLocation.forEach(pos => {
+        var leaf = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.0005, 0.01, 20, 32),
+            leafMaterial
+        );
+        leaf.position.set(pos.x, pos.y, pos.z);
+        leaf.rotation.z = pos.rotationz;
+        leaf.scale.set(500, 1, 1); 
+        window.scene.add(leaf);
+    });
+
+    var topLeafsLocation = [
+        { x: potPosition.x - 18, y: potPosition.y + 57, z: potPosition.z, rotationz: -(Math.PI/1.2)+Math.PI },
+        { x: potPosition.x + 18, y: potPosition.y + 57, z: potPosition.z, rotationz: Math.PI/1.2+Math.PI }
+    ];
+    topLeafsLocation.forEach(pos => {
+        var leaf = new THREE.Mesh(
+            new THREE.CylinderGeometry(0, 0.01, 20, 32),
+            new THREE.MeshPhongMaterial({ map : leafTexture, transparent: true})
+        );
+        leaf.position.set(pos.x, pos.y, pos.z);
+        leaf.rotation.z = pos.rotationz;
+        leaf.scale.set(500, 1, 1); 
+        window.scene.add(leaf);
+    });
+
+
 }
 
 function drawPump() {
