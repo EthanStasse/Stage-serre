@@ -272,7 +272,7 @@ function init() {
     camera.position.set(0, 300, 1500);
     cameraControls.target.set(0, 43, -8);
 
-    /* Lock camera
+    // Lock camera
     cameraControls.enablePan = false;
     cameraControls.maxPolarAngle = Math.PI / 2;
     cameraControls.minPolarAngle = Math.PI / 4;
@@ -280,7 +280,7 @@ function init() {
     cameraControls.maxAzimuthAngle = 0.5;
     cameraControls.minDistance = 500;
     cameraControls.maxDistance = 2000;
-    */
+    
 }
 
 function addToDOM() {
