@@ -28,12 +28,13 @@ async function refreshData() {
         if (window.setToitAngle) window.setToitAngle(lastData.servo);
         updateCard('periodeCard', lastData.periode, '');
         updateCard('pompeCard', lastData.pompe, '');
+        if (window.setPompeState) window.setPompeState(lastData.pompe);
         updateCard('ledCard', lastData.led, '');
         if (window.setLedIntensity) window.setLedIntensity(lastData.led);
         if (lastData.pompe_lock == 0 || lastData.pompe_lock == 600) {
             updateCard('lockCard', 'Not Locked');
         } else {
-            updateCard('lockCard', 'Locked : ', lastData.pompe_lock, 's');
+            updateCard('lockCard', 'Locked : ' + lastData.pompe_lock + 's');
         }
 
         const toitBtn = document.getElementById('toitBtn');

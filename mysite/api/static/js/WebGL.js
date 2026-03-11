@@ -293,10 +293,8 @@ var toitTargetAngle = -1.95;
 window.setToitAngle = function(servoAngle) {
     if (servoAngle >= 180) {
         toitTargetAngle = -2.2;
-        pumpLedMaterial.color.set(0x00ff00);
     } else {
         toitTargetAngle = -1.95;
-        pumpLedMaterial.color.set(0xff0000);
     }
 };
 
@@ -328,6 +326,10 @@ window.setLedIntensity = function(ledState) {
     var intensity = (ledState === 'ON') ? 1e10 : 0;
     ledLights.forEach(function(l) { l.intensity = intensity; });
 };
+
+window.setPompeState = function(pompeState) {
+    pumpLedMaterial.color.set(pompeState === 'ON' ? 0x00ff00 : 0xff0000);
+}
 
 function render() {
     var delta = clock.getDelta();
