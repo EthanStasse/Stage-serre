@@ -11,6 +11,7 @@ var cameraControls;
 var clock = new THREE.Clock();
 var toitMovible = null;
 var potPosition = { x: 100, y: 260, z: 350 };
+var pumpLedMaterial = new THREE.MeshPhongMaterial({ color: 0xFF0000 });
 
 function fillScene() {
     var light = new THREE.DirectionalLight(0xFFFFFF, 2);
@@ -237,11 +238,11 @@ function drawPump() {
     pump.position.set(50, 242, 420);
     window.scene.add(pump);
 
-    var pumpLed = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 10, 32), new THREE.MeshPhongMaterial({ color: 0xFF0000 }));
+    var pumpLed = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 10, 32), pumpLedMaterial);
     pumpLed.position.set(60, 257, 420);
     window.scene.add(pumpLed);
 
-    var pumpTop = new THREE.Mesh(new THREE.SphereGeometry(3, 32, 32), new THREE.MeshPhongMaterial({ color: 0xFF0000 }));
+    var pumpTop = new THREE.Mesh(new THREE.SphereGeometry(3, 32, 32), pumpLedMaterial);
     pumpTop.position.set(60, 262, 420);
     window.scene.add(pumpTop);
 }
@@ -292,8 +293,10 @@ var toitTargetAngle = -1.95;
 window.setToitAngle = function(servoAngle) {
     if (servoAngle >= 180) {
         toitTargetAngle = -2.2;
+        pumpLedMaterial.color.set(0x00ff00);
     } else {
         toitTargetAngle = -1.95;
+        pumpLedMaterial.color.set(0xff0000);
     }
 };
 
