@@ -121,13 +121,15 @@ function drawSerreWalls() {
 }
 
 function drawPillars() {
+    var Textureloader = new THREE.TextureLoader();
+    var pillarTexture = Textureloader.load('/static/js/texture/bois.jpg');
     var material = new THREE.MeshPhongMaterial({
-        color: 0xffffff,
+        map: pillarTexture
     });
 
     var pillarPositions = [[-188, 313.5, 252], [188, 313.5, 252], [-188, 313.5, 448], [188, 313.5, 448]];
     pillarPositions.forEach(pos => {
-        var pillar = new THREE.Mesh(new THREE.BoxGeometry(20, 171, 20), material);
+        var pillar = new THREE.Mesh(new THREE.BoxGeometry(10, 171, 10), material);
         pillar.position.set(...pos);
         window.scene.add(pillar);
     });
