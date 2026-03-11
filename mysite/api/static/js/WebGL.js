@@ -63,7 +63,7 @@ function drawTable() {
 
 function drawWall() {
     var Textureloader = new THREE.TextureLoader();
-    var WallTexture = Textureloader.load('/static/js/texture/Wall.png');
+    var WallTexture = Textureloader.load('/static/js/texture/wall.png');
     var wall = new THREE.Mesh(
         new THREE.BoxGeometry(2000, 1500, 50),
         new THREE.MeshPhongMaterial({ map: WallTexture }) // replace with: { map: WallTexture }
