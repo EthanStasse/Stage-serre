@@ -40,6 +40,7 @@ function fillScene() {
     drawPlant();
     drawPump();
     drawPumpLock();
+    drawPipe();
 }
 
 function drawTable() {
@@ -295,9 +296,9 @@ function drawPump() {
     pumpLed.position.set(60, 257, 420);
     window.scene.add(pumpLed);
 
-    var pumpTop = new THREE.Mesh(new THREE.SphereGeometry(3, 32, 32), pumpLedMaterial);
-    pumpTop.position.set(60, 262, 420);
-    window.scene.add(pumpTop);
+    var pumpLEDTop = new THREE.Mesh(new THREE.SphereGeometry(3, 32, 32), pumpLedMaterial);
+    pumpLEDTop.position.set(60, 262, 420);
+    window.scene.add(pumpLEDTop);
 }
 
 function drawPumpLock() {
@@ -307,6 +308,64 @@ function drawPumpLock() {
     var lock = new THREE.Mesh(new THREE.BoxGeometry(30, 30, 0.1), lockMaterial);
     lock.position.set(50, 242, 437);
     window.scene.add(lock);
+}
+
+function drawPipe() {
+    // Define the points the pipe curves through
+    var curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(50, 232, 420),   // start (at the pump)
+        new THREE.Vector3(-20, 242, 400),   // curve point
+        new THREE.Vector3(-20, 242, 350),   // curve point
+        new THREE.Vector3(50, 295, 350),   // curve point
+        new THREE.Vector3(85, 300, 350),  // end (at the pot)
+    ]);
+
+    var geometry = new THREE.TubeGeometry(
+        curve,   // the curve to follow
+        20,      // number of segments (more = smoother)
+        3,       // pipe radius
+        8,       // pipe roundness (sides)
+        false    // closed tube?
+    );
+
+    var material = new THREE.MeshPhongMaterial({         
+        color: 0x000000,
+        transparent: true,
+        opacity: 0.3,
+        shininess: 100,
+        specular: 0x888888,
+        side: THREE.DoubleSide 
+    });
+    var pipe = new THREE.Mesh(geometry, material);
+    window.scene.add(pipe);
+
+    var curve1 = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(60, 252, 420),   // start (at the pump)
+        new THREE.Vector3(100, 257, 420),   // curve point
+        new THREE.Vector3(150, 262, 420),   // curve point
+        new THREE.Vector3(160, 262, 420),   // curve point
+        new THREE.Vector3(162, 240, 420),  // end (at the pot)
+    ]);
+
+    var geometry1 = new THREE.TubeGeometry(
+        curve1,   // the curve to follow
+        50,      // number of segments (more = smoother)
+        3,       // pipe radius
+        8,       // pipe roundness (sides)
+        false    // closed tube?
+    );
+
+    var material1 = new THREE.MeshPhongMaterial({         
+        color: 0x000000,
+        transparent: true,
+        opacity: 0.3,
+        shininess: 100,
+        specular: 0x888888,
+        side: THREE.DoubleSide 
+    });
+    var pipe1 = new THREE.Mesh(geometry1, material1);
+    window.scene.add(pipe1);
+
 }
 
 function init() {
