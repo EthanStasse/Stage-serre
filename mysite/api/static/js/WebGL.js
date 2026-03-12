@@ -451,6 +451,7 @@ function init() {
     camera.position.set(0, 300, 1500);
     cameraControls.target.set(0, 43, -8);
 
+    // lock camera
     cameraControls.enablePan = false;
     cameraControls.maxPolarAngle = Math.PI / 2.3;
     cameraControls.minPolarAngle = Math.PI / 4;
