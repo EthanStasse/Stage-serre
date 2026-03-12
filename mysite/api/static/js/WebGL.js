@@ -19,6 +19,10 @@ var tankBottom = 225;
 var waterTube = 0;
 var innerPipeMaterial = null;
 var innerPipeMaterial1 = null;
+var waterDrops = [];
+var dropOrigin = new THREE.Vector3(85, 300, 350);
+var gravity = -0.015;
+var dropTimer = 0;
 
 function fillScene() {
     var light = new THREE.DirectionalLight(0xFFFFFF, 2);
@@ -49,6 +53,7 @@ function fillScene() {
     drawPipe();
     drawWaterTank();
     drawWater();
+    drawWaterDrops();
 }
 
 function drawTable() {
@@ -406,6 +411,30 @@ function drawWater() {
     window.scene.add(waterMesh);
 }
 
+function drawWaterDrops() {
+
+    var material = new THREE.MeshPhongMaterial({
+        color: 0x4aa3ff,
+        transparent: true,
+        opacity: 0.9
+    });
+
+    for (let i = 0; i < 30; i++) {
+
+        var drop = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 8, 8),
+            material
+        );
+
+        drop.visible = false;
+
+        drop.userData.velocity = new THREE.Vector3();
+
+        window.scene.add(drop);
+        waterDrops.push(drop);
+    }
+}
+
 function init() {
     var container = document.querySelector('.container');
     var canvasWidth = container.offsetWidth;
@@ -520,6 +549,44 @@ function render() {
     if (innerPipeMaterial1) {
         innerPipeMaterial1.opacity = waterTube;
     }
+    dropTimer += delta;
+
+waterDrops.forEach(drop => {
+
+    if (waterTube > 0) {
+
+        if (!drop.visible && dropTimer > 0.05) {
+
+            drop.visible = true;
+            drop.position.copy(dropOrigin);
+
+            drop.userData.velocity.set(
+                (Math.random() - 0.5) * 0.2,
+                -0.2,
+                (Math.random() - 0.5) * 0.2
+            );
+
+            dropTimer = 0;
+        }
+
+        if (drop.visible) {
+
+            drop.userData.velocity.y += gravity;
+            drop.position.add(drop.userData.velocity);
+
+            if (drop.position.y < potPosition.y + 40) {
+                drop.visible = false;
+            }
+
+        }
+
+    } else {
+
+        drop.visible = false;
+
+    }
+
+});
 
     renderer.render(window.scene, camera);
 }
