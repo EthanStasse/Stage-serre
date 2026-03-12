@@ -470,8 +470,8 @@ window.setLedIntensity = function(ledState) {
 
 window.setPompeState = function(pompeState) {
     pumpLedMaterial.color.set(pompeState === 'ON' ? 0x00ff00 : 0xff0000);
-    while (pompeState === 'ON') {
-        waterlevel = waterlevel-0.1
+    if (pompeState === 'ON') {
+        waterlevel = waterlevel-5
     }
 };
 
