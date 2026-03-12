@@ -19,10 +19,20 @@ var tankBottom = 225;
 var waterTube = 0;
 var innerPipeMaterial = null;
 var innerPipeMaterial1 = null;
-var waterDrops = [];
+
+/* -------- DROP SYSTEM (OPTIMIZED) -------- */
+const DROP_COUNT = 30;
+var dropMesh = null;
+var dropData = [];
+
 var dropOrigin = new THREE.Vector3(85, 300, 350);
-var gravity = -0.015;
+var gravity = -0.15;
 var dropTimer = 0;
+
+const tempMatrix = new THREE.Matrix4();
+const tempPosition = new THREE.Vector3();
+
+var splashParticles = [];
 
 function fillScene() {
     var light = new THREE.DirectionalLight(0xFFFFFF, 2);
@@ -413,25 +423,53 @@ function drawWater() {
 
 function drawWaterDrops() {
 
-    var material = new THREE.MeshPhongMaterial({
+    const geometry = new THREE.SphereGeometry(1, 8, 8);
+
+    const material = new THREE.MeshPhongMaterial({
         color: 0x4aa3ff,
         transparent: true,
         opacity: 0.9
     });
 
-    for (let i = 0; i < 30; i++) {
+    dropMesh = new THREE.InstancedMesh(geometry, material, DROP_COUNT);
+    window.scene.add(dropMesh);
 
-        var drop = new THREE.Mesh(
-            new THREE.SphereGeometry(1, 8, 8),
-            material
+    for (let i = 0; i < DROP_COUNT; i++) {
+
+        dropData.push({
+            position: new THREE.Vector3(),
+            velocity: new THREE.Vector3(),
+            active: false
+        });
+
+        tempMatrix.identity();
+        dropMesh.setMatrixAt(i, tempMatrix);
+    }
+
+    dropMesh.instanceMatrix.needsUpdate = true;
+}
+
+function createSplash(position) {
+
+    const geo = new THREE.SphereGeometry(0.6, 6, 6);
+    const mat = new THREE.MeshPhongMaterial({ color: 0x4aa3ff });
+
+    for (let i = 0; i < 5; i++) {
+
+        let p = new THREE.Mesh(geo, mat);
+
+        p.position.copy(position);
+
+        p.userData.velocity = new THREE.Vector3(
+            (Math.random() - 0.5) * 0.5,
+            Math.random() * 0.4,
+            (Math.random() - 0.5) * 0.5
         );
 
-        drop.visible = false;
+        p.userData.life = 0.4;
 
-        drop.userData.velocity = new THREE.Vector3();
-
-        window.scene.add(drop);
-        waterDrops.push(drop);
+        window.scene.add(p);
+        splashParticles.push(p);
     }
 }
 
@@ -506,7 +544,7 @@ ledLightPosition.forEach(pos => {
 });
 
 window.setLedIntensity = function(ledState) {
-    var intensity = (ledState === 'ON') ? 1e10 : 0;
+    var intensity = (ledState === 'ON') ? 250000 : 0;
     ledLights.forEach(function(l) { l.intensity = intensity; });
 };
 
@@ -515,7 +553,7 @@ window.setPompeState = function(pompeState) {
     if (pompeState === 'ON') {
         waterlevel = Math.max(0, waterlevel - 0.5);  // ✅ never goes below 0
         waterTube = 0.8;  // ✅ make tube visible when pump is on
-    }else {
+    } else {
         waterTube = 0;  // ✅ hide tube when pump is off
     }
 };
@@ -550,44 +588,75 @@ function render() {
     if (innerPipeMaterial1) {
         innerPipeMaterial1.opacity = waterTube;
     }
+
     dropTimer += delta;
 
-waterDrops.forEach(drop => {
+    for (let i = 0; i < DROP_COUNT; i++) {
 
-    if (waterTube > 0) {
+        const drop = dropData[i];
 
-        if (!drop.visible && dropTimer > 0.05) {
+        if (waterTube > 0) {
 
-            drop.visible = true;
-            drop.position.copy(dropOrigin);
+            if (!drop.active && dropTimer > 0.05) {
 
-            drop.userData.velocity.set(
-                (Math.random() - 0.5) * 0.2,
-                -0.2,
-                (Math.random() - 0.5) * 0.2
-            );
+                drop.active = true;
+                drop.position.copy(dropOrigin);
 
-            dropTimer = 0;
-        }
+                drop.velocity.set(
+                    (Math.random() - 0.5) * 0.2,
+                    -2,
+                    (Math.random() - 0.5) * 0.2
+                );
 
-        if (drop.visible) {
-
-            drop.userData.velocity.y += gravity;
-            drop.position.add(drop.userData.velocity);
-
-            if (drop.position.y < potPosition.y + 40) {
-                drop.visible = false;
+                dropTimer = 0;
             }
 
+            if (drop.active) {
+
+                drop.velocity.y += gravity;
+                drop.position.add(drop.velocity);
+
+                if (drop.position.y < potPosition.y + 40) {
+
+                    createSplash(drop.position);
+                    drop.active = false;
+
+                }
+
+            }
+
+        } else {
+
+            drop.active = false;
+
         }
 
-    } else {
+        if (drop.active) {
+            tempPosition.copy(drop.position);
+        } else {
+            tempPosition.set(0, -1000, 0);
+        }
 
-        drop.visible = false;
-
+        tempMatrix.setPosition(tempPosition);
+        dropMesh.setMatrixAt(i, tempMatrix);
     }
 
-});
+    dropMesh.instanceMatrix.needsUpdate = true;
+
+    /* Update splash particles */
+    splashParticles.forEach((p, i) => {
+
+        p.userData.velocity.y += gravity * 0.3;
+        p.position.add(p.userData.velocity);
+
+        p.userData.life -= delta;
+
+        if (p.userData.life <= 0) {
+            window.scene.remove(p);
+            splashParticles.splice(i, 1);
+        }
+
+    });
 
     renderer.render(window.scene, camera);
 }
