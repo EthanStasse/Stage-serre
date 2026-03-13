@@ -518,7 +518,7 @@ window.setLCDText = function() {
     lcdCtx.fillStyle = '#006400';
     lcdCtx.fillRect(0, 0, 356, 64);
 
-    lcdCtx.fillStyle = '#00ff00';
+    lcdCtx.fillStyle = '#000000';
     lcdCtx.font = 'bold 20px monospace';
 
     lcdCtx.fillText('Temp: ' + temp.toFixed(1) + 'C', 10, 25);
