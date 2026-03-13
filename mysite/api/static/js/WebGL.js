@@ -55,7 +55,7 @@ function fillScene() {
     drawSerreWalls();
     drawPillars();
     drawSupportToit();
-    drawToitFix();
+    drawToit();
     drawLED();
     drawPot();
     drawPlant();
@@ -64,6 +64,7 @@ function fillScene() {
     drawWaterTank();
     drawWaterDrops();
     drawLCD();
+    drawServo();
 }
 
 function drawTable() {
@@ -188,7 +189,7 @@ function drawSupportToit() {
     });
 }
 
-function drawToitFix() {
+function drawToit() {
     var material = new THREE.MeshPhongMaterial({
         color: 0xffffff,
         transparent: true,
@@ -209,7 +210,7 @@ function drawToitFix() {
     toit.position.set(0, -105, 0);
 
     toitMovible = new THREE.Object3D();
-    toitMovible.position.set(190, 400, 350);
+    toitMovible.position.set(194, 397.5, 350);
     toitMovible.rotation.z = Math.PI / 2.6;
     toitMovible.add(toit);
 
@@ -511,8 +512,24 @@ window.setLCDText = function() {
 
     lcdTexture.needsUpdate = true;
 };
+}
 
+function drawServo(){
 
+    var servo = new THREE.Mesh(new THREE.BoxGeometry(20, 40, 20), new THREE.MeshPhongMaterial({ color: 0x333333 }));
+    servo.position.set(70, 420, 450);
+    servo.rotation.z = Math.PI/2.6;
+    window.scene.add(servo);
+
+    var axe = new THREE.Mesh(new THREE.CylinderGeometry(2,2,30,24), new THREE.MeshPhongMaterial({color: 0x8E8E8E}));
+    axe.position.set(80, 420, 430);
+    axe.rotation.x = Math.PI/2;
+    window.scene.add(axe);
+
+    var arm = new THREE.Mesh(new THREE.CylinderGeometry(15, 15, 5,24), new THREE.MeshPhongMaterial({color: 0x8E8E8E}));
+    arm.position.set(80,420,415);
+    arm.rotation.x = -(Math.PI/2);
+    window.scene.add(arm);
 
 
 }
@@ -530,7 +547,7 @@ function init() {
 
     camera = new THREE.PerspectiveCamera(30, canvasRatio, 1, 10000);
     cameraControls = new OrbitControls(camera, renderer.domElement);
-    camera.position.set(0, 300, 1500);
+    camera.position.set(0, 500, 1500);
     cameraControls.target.set(0, 43, -8);
 
     // lock camera
