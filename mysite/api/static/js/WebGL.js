@@ -551,7 +551,7 @@ function drawServo(){
     var material = new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide });
     beltMesh = new THREE.Mesh(geometry, material);
     beltMesh.position.set(80, 420, 430);  // centré sur le grand cercle = position du servo
-    beltMesh.rotation.z = -(Math.PI/6);
+    beltMesh.rotation.z = -(Math.PI*1.3);
     window.scene.add(beltMesh);    
 
 }
@@ -678,7 +678,7 @@ function render() {
     if (toitMovible) {
         toitMovible.rotation.z += (toitTargetAngle - toitMovible.rotation.z) * 0.05;
         if (beltMesh) {
-            beltMesh.rotation.z += (toitTargetAngle - toitMovible.rotation.z) * 0.05;
+            beltMesh.rotation.z += (toitTargetAngle - toitMovible.rotation.z) * 0.15;
         }
     }
 
