@@ -64,6 +64,7 @@ function fillScene() {
     drawWaterTank();
     drawWater();
     drawWaterDrops();
+    drawLCD();
 }
 
 function drawTable() {
@@ -471,6 +472,55 @@ function createSplash(position) {
         window.scene.add(p);
         splashParticles.push(p);
     }
+}
+
+function drawLCD(){
+
+    var lcdCanvas = document.createElement('canvas');
+    lcdCanvas.width = 356;
+    lcdCanvas.height = 64;
+    var lcdCtx = lcdCanvas.getContext('2d');
+    lcdCtx.fillStyle = '#006400';
+    lcdCtx.fillRect(0, 0, 356, 64);
+    lcdCtx.fillStyle = '#000000';
+    lcdCtx.font = 'bold 20px monospace';
+    lcdCtx.fillText('Temp:25.3C', 10, 25);
+    lcdCtx.fillText('Hum sol:600', 10, 50);
+    lcdCtx.fillText('Lum:300Lux', 170, 25);
+    lcdCtx.fillText('Hum air:39.0%', 170, 50);
+    var lcdTexture = new THREE.CanvasTexture(lcdCanvas);
+
+    var material = new THREE.MeshPhongMaterial({
+        map: lcdTexture,
+        transparent: true,
+        opacity: 0.9,
+        shininess: 100,
+        side: THREE.DoubleSide
+    });
+
+    var lcdScreen = new THREE.Mesh(
+        new THREE.BoxGeometry(120, 20, 10),
+        material
+    );
+    lcdScreen.position.set(-80, 340, 455);
+    window.scene.add(lcdScreen); 
+
+    var lcdBack = new THREE.Mesh(
+        new THREE.BoxGeometry(135, 35, 5),
+        new THREE.MeshPhongMaterial({ color: 0x006600 })
+    );
+    lcdBack.position.set(-80, 340, 450);
+    window.scene.add(lcdBack);
+
+    window.setLCDText = function(text) {
+        lcdCtx.fillStyle = '#006400';
+        lcdCtx.fillRect(0, 0, 256, 64);
+        lcdCtx.fillStyle = '#00ff00';
+        lcdCtx.font = 'bold 20px monospace';
+        lcdCtx.fillText(text, 10, 40);
+        lcdTexture.needsUpdate = true;
+    };
+
 }
 
 function init() {
